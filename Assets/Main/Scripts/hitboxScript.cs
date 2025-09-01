@@ -15,13 +15,13 @@ public class hitboxScript : MonoBehaviourPunCallbacks
         if (((1 << collision.gameObject.layer) & stats._attackLayer) != 0)
         {
             PhotonView targetView = collision.gameObject.GetComponent<PhotonView>();
-            PhotonView myView = transform.root.GetComponent<PhotonView>(); // busco el photon view del padre (en este caso el jugador xq las armas son hijos)
+            PhotonView myView = transform.root.GetComponent<PhotonView>();
 
             if (targetView && myView)
             {
-                // ⚔️ Envía el daño al dueño del jugador
-                targetView.RPC(nameof(PlayerGunSync.RPC_MakeDamage), RpcTarget.MasterClient, myView.ViewID, stats._damage); // llamo al rpc del gunsync para dañar a los zombies
+                myView.RPC(nameof(EnemySyncScript.RPC_EnemyDamage), RpcTarget.All, targetView.ViewID, stats._damage); // llamo al rpc del gunsync para dañar a los zombies
             }
+            Debug.Log(collision);
            
         }
     }

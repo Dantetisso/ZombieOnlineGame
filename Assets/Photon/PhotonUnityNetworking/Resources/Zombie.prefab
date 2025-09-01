@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7466593210481441102}
   - component: {fileID: 3993065745433120583}
   - component: {fileID: 2464494861505705611}
-  - component: {fileID: 4021763130633058138}
   m_Layer: 0
   m_Name: hitbox
   m_TagString: Untagged
@@ -66,28 +65,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 2
---- !u!114 &4021763130633058138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 942493531155212126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &2643109736072550674
 GameObject:
   m_ObjectHideFlags: 0
@@ -109,6 +86,7 @@ GameObject:
   - component: {fileID: 7323424294212425149}
   - component: {fileID: 1650658337178217681}
   - component: {fileID: 7828015227974735552}
+  - component: {fileID: 8806686371319385635}
   m_Layer: 8
   m_Name: Zombie
   m_TagString: Untagged
@@ -397,6 +375,18 @@ MonoBehaviour:
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
+--- !u!114 &8806686371319385635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2643109736072550674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3212a1d4ea5403146813e633957c3089, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3382354808654727446
 GameObject:
   m_ObjectHideFlags: 0

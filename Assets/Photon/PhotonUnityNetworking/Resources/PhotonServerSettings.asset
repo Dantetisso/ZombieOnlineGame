@@ -56,6 +56,8 @@ MonoBehaviour:
   - RPC_Victory
   - RPC_ShowMessage
   - RPC_TakeDamage
+  - RPC_PlayerTakeDamage
+  - RPC_EnemyDamage
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

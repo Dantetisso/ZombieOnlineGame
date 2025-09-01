@@ -47,5 +47,4 @@ public class PlayerGunSync : MonoBehaviourPun // este script es para que se pued
             damageable.GetDamage(damage);
         }
     }
-    
 }

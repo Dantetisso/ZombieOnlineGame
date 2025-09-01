@@ -3,7 +3,7 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 
-public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
+public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 {
     #region  Variables
     [Header("Movment")]
@@ -101,7 +101,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Debug.Log(PhotonNetwork.InRoom + "is on room");
+                Debug.Log(PhotonNetwork.InRoom + " is on room");
                 RoomLeaver.Instance.LeaveRoom(); 
 
                 //Application.Quit();
