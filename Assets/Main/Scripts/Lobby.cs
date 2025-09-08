@@ -18,7 +18,8 @@ public class Lobby : MonoBehaviourPunCallbacks
         createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
         manager = FindObjectOfType<GameManager>();
         EmptyTexts();
-        if (!photonView.IsMine) createRoomButton.gameObject.SetActive(false);
+
+        if (!photonView.IsMine) createRoomButton.gameObject.SetActive(false); // para que el boton de play solo lo pueda ver el master 
 
         ConnectionManager.Instance.OnJoinRoom += UpdateTexts;
         ConnectionManager.Instance.OnPlayerEnterRoom += UpdateTexts;
@@ -38,7 +39,6 @@ public class Lobby : MonoBehaviourPunCallbacks
 
     private void UpdateTexts()
     {
-        // Limpio todos los textos primero
         for (int i = 0; i < playerNickNameTexts.Length; i++)
         {
             playerNickNameTexts[i].text = "";
@@ -47,18 +47,22 @@ public class Lobby : MonoBehaviourPunCallbacks
         // Obtengo jugadores conectados
         Dictionary<int, Player> players = ConnectionManager.Instance.GetPlayersInRoom();
 
+        //ordeno los jugadores por actornumber (orden de entrada) 
+        List<Player> orderedPlayers = new List<Player>(players.Values);
+        orderedPlayers.Sort((p1, p2) => p1.ActorNumber.CompareTo(p2.ActorNumber));
+
         int index = 0;
-        foreach (KeyValuePair<int, Player> player in players)
+        foreach (Player player in orderedPlayers)
         {
-            if (index < playerNickNameTexts.Length) // seguridad por si hay más jugadores que slots
+            if (index < playerNickNameTexts.Length)
             {
-                playerNickNameTexts[index].text = player.Value.NickName;
+                playerNickNameTexts[index].text = player.NickName;
                 index++;
             }
         }
 
         // Habilito el botón solo si hay entre 2 y 4 jugadores
-        int count = players.Count;
+        int count = orderedPlayers.Count;
         createRoomButton.interactable = count >= 2 && count <= 4;
 
         Debug.Log($"[Lobby] Jugadores en la sala: {count}");
@@ -72,7 +76,7 @@ public class Lobby : MonoBehaviourPunCallbacks
         }
     }
 
-    void OnDestroy() // desuscribiendose para que cuando un jugador salga de la partida no siga llamando a los eventos y re rompa todo
+    void OnDestroy() // desuscribiendose para que cuando un jugador salga de la partida no siga llamando a los eventos y se rompa todo
     {
         if (ConnectionManager.Instance == null) return;
 
