@@ -27,14 +27,14 @@ public class Lobby : MonoBehaviourPunCallbacks
         UpdateTexts();
     }
 
-    void OnCreateRoomButtonClicked()
+    void OnCreateRoomButtonClicked() // al apretar el boton empieza el juego, no crea ninguna room
     {
         if (PhotonNetwork.IsMasterClient)
         {
             manager.StartGame();
         }
 
-        Debug.Log("<color=green>Botón tocado</color>");
+        Debug.Log("<color=green>Botón de play tocado</color>");
     }
 
     private void UpdateTexts()
