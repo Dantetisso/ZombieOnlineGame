@@ -27,7 +27,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
         string playerName = playerNameInput.text.Trim();
 
-        if (string.IsNullOrEmpty(playerName)) // se supone que chequea si tenes nickname, si no tenes no te deberia dejar haacer nada
+        if (string.IsNullOrEmpty(playerName)) // se supone que chequea si tenes nickname, si no tenes no te deberia dejar hacer nada
         {
             Debug.LogWarning("sin nickname no entras.");
             return;

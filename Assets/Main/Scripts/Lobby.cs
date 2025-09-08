@@ -18,10 +18,12 @@ public class Lobby : MonoBehaviourPunCallbacks
         createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
         manager = FindObjectOfType<GameManager>();
         EmptyTexts();
+        if (!photonView.IsMine) createRoomButton.gameObject.SetActive(false);
 
-        ConnectionManager.Instance.OnJoinRoom += UpdatePlayers;
-        ConnectionManager.Instance.OnPlayerEnterRoom += UpdatePlayers;
-        ConnectionManager.Instance.OnPlayerLeaveRoom += UpdatePlayers;
+        ConnectionManager.Instance.OnJoinRoom += UpdateTexts;
+        ConnectionManager.Instance.OnPlayerEnterRoom += UpdateTexts;
+        ConnectionManager.Instance.OnPlayerLeaveRoom += UpdateTexts;
+        UpdateTexts();
     }
 
     void OnCreateRoomButtonClicked()
@@ -34,21 +36,32 @@ public class Lobby : MonoBehaviourPunCallbacks
         Debug.Log("<color=green>Botón tocado</color>");
     }
 
-    private void UpdatePlayers()
+    private void UpdateTexts()
     {
-        Dictionary<int, Player> players = ConnectionManager.Instance.GetPlayersInRoom();
-        Debug.Log("Players count" + players.Count);
-        int index = 0;
-
-        foreach (KeyValuePair<int, Player> player in players) // x cada jugador pongo el texto
+        // Limpio todos los textos primero
+        for (int i = 0; i < playerNickNameTexts.Length; i++)
         {
-            playerNickNameTexts[index].text = player.Value.NickName;
-            index++;
+            playerNickNameTexts[i].text = "";
         }
 
-        int count = ConnectionManager.Instance.GetPlayersInRoom().Count;
+        // Obtengo jugadores conectados
+        Dictionary<int, Player> players = ConnectionManager.Instance.GetPlayersInRoom();
+
+        int index = 0;
+        foreach (KeyValuePair<int, Player> player in players)
+        {
+            if (index < playerNickNameTexts.Length) // seguridad por si hay más jugadores que slots
+            {
+                playerNickNameTexts[index].text = player.Value.NickName;
+                index++;
+            }
+        }
+
+        // Habilito el botón solo si hay entre 2 y 4 jugadores
+        int count = players.Count;
         createRoomButton.interactable = count >= 2 && count <= 4;
 
+        Debug.Log($"[Lobby] Jugadores en la sala: {count}");
     }
 
     void EmptyTexts()
@@ -63,9 +76,9 @@ public class Lobby : MonoBehaviourPunCallbacks
     {
         if (ConnectionManager.Instance == null) return;
 
-        ConnectionManager.Instance.OnJoinRoom        -= UpdatePlayers;
-        ConnectionManager.Instance.OnPlayerEnterRoom -= UpdatePlayers;
-        ConnectionManager.Instance.OnPlayerLeaveRoom -= UpdatePlayers;
+        ConnectionManager.Instance.OnJoinRoom        -= UpdateTexts;
+        ConnectionManager.Instance.OnPlayerEnterRoom -= UpdateTexts;
+        ConnectionManager.Instance.OnPlayerLeaveRoom -= UpdateTexts;
     }
     
 }
