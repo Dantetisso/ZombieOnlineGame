@@ -9,17 +9,17 @@ using UnityEngine.UI;
 
 public class Lobby : MonoBehaviourPunCallbacks  
 {                                               
-    [SerializeField] private Button createRoomButton;
+    [SerializeField] private Button startGameButton;
     [SerializeField] private TMP_Text[] playerNickNameTexts;
     [SerializeField] private GameManager manager;
 
     void Start()
     {
-        createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
+        startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         manager = FindObjectOfType<GameManager>();
         EmptyTexts();
 
-        if (!photonView.IsMine) createRoomButton.gameObject.SetActive(false); // para que el boton de play solo lo pueda ver el master 
+        if (!photonView.IsMine) startGameButton.gameObject.SetActive(false); // para que el boton de play solo lo pueda ver el master 
 
         ConnectionManager.Instance.OnJoinRoom += UpdateTexts;
         ConnectionManager.Instance.OnPlayerEnterRoom += UpdateTexts;
@@ -27,7 +27,7 @@ public class Lobby : MonoBehaviourPunCallbacks
         UpdateTexts();
     }
 
-    void OnCreateRoomButtonClicked() // al apretar el boton empieza el juego, no crea ninguna room
+    void OnStartGameButtonClicked() // al apretar el boton empieza el juego
     {
         if (PhotonNetwork.IsMasterClient)
         {
@@ -63,7 +63,7 @@ public class Lobby : MonoBehaviourPunCallbacks
 
         // Habilito el botón solo si hay entre 2 y 4 jugadores
         int count = orderedPlayers.Count;
-        createRoomButton.interactable = count >= 2 && count <= 4;
+        startGameButton.interactable = count >= 2 && count <= 4;
 
         Debug.Log($"[Lobby] Jugadores en la sala: {count}");
     }

@@ -9,6 +9,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
     [SerializeField] private InputField playerNameInput;
     [SerializeField] private Button connectButton;
+    [SerializeField] private GameObject joinPanel;
 
     void Start()
     {
@@ -19,6 +20,11 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         playerNameInput.text = "";
 
         connectButton.onClick.AddListener(OnConnectButtonClicked);
+    }
+
+    void OnJoinButtonClicked()
+    {
+        joinPanel.SetActive(true);
     }
 
     void OnConnectButtonClicked()
