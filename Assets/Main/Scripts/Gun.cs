@@ -1,11 +1,8 @@
 using System.Collections;
-using System.Collections.Generic;
-using ExitGames.Client.Photon.StructWrapping;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Unity.Mathematics;
 
 public class Gun : MonoBehaviourPunCallbacks, IGun
 {
@@ -16,66 +13,79 @@ public class Gun : MonoBehaviourPunCallbacks, IGun
     [SerializeField] private Text maxAmmoCount;
     [SerializeField] private LayerMask zombieMask;
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private GameObject muzzleFlash;
+    [SerializeField] private SpriteRenderer muzzleFlash;
 
     private Vector2 mousePos;
     private Vector2 startPos;
-    private MarketScript market;
     private int currentAmmo;
     private int maxAmmo;
     private int ammoClip;
-    private int shotsFired;
     private bool IsReloading;
-    private bool isShooting;
     private float nextFireTime;
+
+    private PhotonView playerPhotonView; // cacheo para no buscar cada disparo
+    private Coroutine flashCoroutine;    // para controlar la corutina del flash
     #endregion
 
     #region Metodos de Unity
     void Start()
     {
-        // market = FindObjectOfType<MarketScript>();
+        // Inicializo munición
         ammoClip = gunData._clipAmmo;
         currentAmmo = ammoClip;
         maxAmmo = gunData._maxAmmo;
         ammoCount.text = currentAmmo.ToString();
         maxAmmoCount.text = maxAmmo.ToString();
+
+        // ------------------------ Apago el flash al inicio ------------------------ //
+        if (muzzleFlash != null)
+            muzzleFlash.enabled = false;
+
+        // obtengo el PhotonView del player (porque el arma es hijo del objeto player donde tengo el photon view)
+        playerPhotonView = transform.root.GetComponent<PhotonView>();
     }
 
     void Update()
     {
-        if (photonView.IsMine)
-        {
-            mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            startPos = shootPoint.position;
+        if (!photonView.IsMine) return;
 
-            if (gunData._IsAutomatic)
-            {
-                if (Input.GetKey(KeyCode.Mouse0) && Time.time >= nextFireTime && currentAmmo > 0)
-                {
-                    nextFireTime = Time.time + 1f / gunData._fireFate; // limito la velocidad de disparo
-                    Shoot();
-                }
-            }
-            else
-            {
-                if (Input.GetKeyDown(KeyCode.Mouse0) && currentAmmo > 0)
-                {
-                    Shoot();
-                }
-            }
+        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        startPos = shootPoint.position;
 
-            if (maxAmmo > 0 && Input.GetKeyDown(KeyCode.R))
-            {
-                Reload();
-            }
+        HandleShooting();
+        HandleReloading();
 
-            ammoCount.text = currentAmmo.ToString();
-            maxAmmoCount.text = maxAmmo.ToString();
-        }
+        ammoCount.text = currentAmmo.ToString();
+        maxAmmoCount.text = maxAmmo.ToString();
     }
     #endregion
 
     #region Metodos
+    private void HandleShooting()
+    {
+        if (gunData._IsAutomatic)
+        {
+            if (Input.GetKey(KeyCode.Mouse0) && Time.time >= nextFireTime && currentAmmo > 0)
+            {
+                nextFireTime = Time.time + 1f / gunData._fireFate;
+                Shoot();
+            }
+        }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.Mouse0) && currentAmmo > 0)
+            {
+                Shoot();
+            }
+        }
+    }
+
+    private void HandleReloading()
+    {
+        if (maxAmmo > 0 && Input.GetKeyDown(KeyCode.R))
+            Reload();
+    }
+
     public void Shoot()
     {
         if (IsReloading) return;
@@ -86,41 +96,45 @@ public class Gun : MonoBehaviourPunCallbacks, IGun
 
         RaycastHit2D hit = Physics2D.Raycast(startPos, dir, range, zombieMask);
 
-        if (hit.collider && hit.distance <= range) // si le pego a un collider y esta dentro del rango.....
+        if (hit.collider && hit.distance <= range)
         {
-            PhotonView targetPhotonView = hit.collider.GetComponent<PhotonView>(); // si le pegue a un objecto que tiene el photonview
-            PhotonView playerPhotonView = transform.root.GetComponent<PhotonView>(); // busco el photon view del padre (en este caso el jugador xq las armas son hijos)
+            PhotonView targetPhotonView = hit.collider.GetComponent<PhotonView>();
 
-            if (targetPhotonView && playerPhotonView) // si encontre el view del objetivo, en este caso zombie y el del padre (el jugador)
+            if (targetPhotonView && playerPhotonView)
             {
-                playerPhotonView.RPC(nameof(PlayerGunSync.RPC_MakeDamage), RpcTarget.MasterClient, targetPhotonView.ViewID, gunData._damage); // llamo al rpc del gunsync para dañar a los zombies
+                // Llamo RPC de daño solo al MasterClient
+                playerPhotonView.RPC(nameof(PlayerGunSync.RPC_MakeDamage),
+                                     RpcTarget.MasterClient,
+                                     targetPhotonView.ViewID,
+                                     gunData._damage);
             }
         }
 
         //------------------------------- Feedback Local ------------------------------- //
-        // lo hago local para evitar el delay del server y que desde mi camara se vea y escuche que estoy disparando
+        // Se hace local para evitar delay y se ve en la propia cámara
         PlayShootSound();
-        StartCoroutine(MuzzleFlashRoutine());
+        ShowFlash();
 
-        //------------------------------- Feedback Servidor ------------------------------- //
-        PhotonView pv = transform.root.GetComponent<PhotonView>(); // vuelvo a buscar el view del jugador para llamar a los rpcs de feedback (flash y gun shoot)
-        pv.RPC(nameof(PlayerGunSync.RPC_PlayShootSound), RpcTarget.Others); // y  solo se los aplico a los otros jugadores 
-        pv.RPC(nameof(PlayerGunSync.RPC_ShowMuzzleFlash), RpcTarget.Others);    // porque ellos tienen que saber que estoy disparando
+        //------------------------------- Feedback Red ------------------------------- //
+        // Solo se llama a RPC una vez por disparo para otros jugadores
+        if (playerPhotonView != null)
+        {
+            playerPhotonView.RPC(nameof(PlayerGunSync.RPC_PlayShootSound), RpcTarget.Others);
+            playerPhotonView.RPC(nameof(PlayerGunSync.RPC_ShowMuzzleFlash), RpcTarget.Others);
+        }
     }
 
     public void Reload()
     {
         if (IsReloading || maxAmmo <= 0 || currentAmmo == ammoClip)
-        {
-            return; // No recarga si ya está recargando, no hay balas, o el cargador está lleno
-        }
+            return;
 
         IsReloading = true;
 
-        int ammoNeeded = ammoClip - currentAmmo; // Cuántas balas faltan para llenar el cargador
-        int ammoToLoad = Mathf.Min(ammoNeeded, maxAmmo); // Carga solo lo que haya disponible
+        int ammoNeeded = ammoClip - currentAmmo;
+        int ammoToLoad = Mathf.Min(ammoNeeded, maxAmmo);
 
-        currentAmmo += ammoToLoad; // añade las balas al cargador y resta de la reserva
+        currentAmmo += ammoToLoad;
         maxAmmo -= ammoToLoad;
 
         IsReloading = false;
@@ -137,22 +151,27 @@ public class Gun : MonoBehaviourPunCallbacks, IGun
         maxAmmo = gunData._maxAmmo;
     }
 
-    IEnumerator MuzzleFlashRoutine() // corutina para prender y apagar el flash al disparar
+    IEnumerator MuzzleFlashRoutine()
     {
-        muzzleFlash.SetActive(true);
-        yield return new WaitForSeconds(0.05f);   // prendo el flash pasa el tiempo y lo apago 
-        muzzleFlash.SetActive(false);
+        if (muzzleFlash == null) yield break;
+
+        muzzleFlash.enabled = true;
+        yield return new WaitForSeconds(0.1f);   // duracion del flash
+        muzzleFlash.enabled = false;
     }
 
-    public void ShowFlash() // llamo a la corutina 
+    public void ShowFlash()
     {
-        StartCoroutine(MuzzleFlashRoutine());
+        // Detengo corutina anterior si estaba corriendo
+        if (flashCoroutine != null)
+            StopCoroutine(flashCoroutine);
+
+        flashCoroutine = StartCoroutine(MuzzleFlashRoutine());
     }
 
-    public void PlayShootSound() // metodo que reproduce el sonido de disparo
+    public void PlayShootSound()
     {
         audioSource.PlayOneShot(gunData._shootSound);
     }
     #endregion
-    
 }
