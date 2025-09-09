@@ -52,8 +52,6 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
     void OnConnectButtonClicked()
     {
-        PhotonNetwork.AutomaticallySyncScene = true;
-
         string playerName = playerNameInput.text.Trim();
         if (string.IsNullOrEmpty(playerName))
         {
@@ -89,16 +87,18 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
     void OnCreateRoomConfirmed()
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
+        
         string roomName = roomNameInput.text.Trim();
         if (string.IsNullOrEmpty(roomName))
         {
-            Debug.LogWarning("El nombre de la sala no puede estar vacío.");
-            return;
+            roomName = $"{PhotonNetwork.NickName}'s Room"; // si no pones un nombre te pone este por defecto
         }
 
         // Creo la sala con max 4 jugadores
         ConnectionManager.Instance.CreateRoom(roomName);
         hasRequestedJoinRoom = true;
+        createRoomPanel.SetActive(false);
     }
 
     public override void OnJoinedRoom()
