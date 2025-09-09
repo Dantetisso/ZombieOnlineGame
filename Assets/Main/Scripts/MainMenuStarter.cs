@@ -2,29 +2,52 @@ using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
+using Photon.Realtime;
+using System.Collections.Generic;
 
 public class MainMenuStarter : MonoBehaviourPunCallbacks
 {
-    public static bool hasRequestedJoinRoom = false; // bool para chequear si no estoy queriendo meterme a una escena
+    public static bool hasRequestedJoinRoom = false;
 
-    [SerializeField] private InputField playerNameInput;
+    [Header("Main Menu")]
+    [SerializeField] private TMP_InputField playerNameInput;
     [SerializeField] private Button connectButton;
-    [SerializeField] private GameObject joinPanel;
+
+    [Header("Panels")]
+    [SerializeField] private GameObject connectPanel; 
+    [SerializeField] private GameObject joinPanel;       // panel de rooms
+    [SerializeField] private GameObject createRoomPanel; // panel para crear room
+    [SerializeField] private Button createRoomButton;
+
+    [Header("Create Room UI")]
+    [SerializeField] private TMP_InputField roomNameInput;
+    [SerializeField] private Button createRoomConfirmButton;
+
+    [Header("Join Panel Slots Fijos")]
+    [SerializeField] private RoomListUI.RoomSlot[] roomSlots; // slots fijos asignados en inspector
+    private RoomListUI roomListUI;
 
     void Start()
     {
-        PhotonNetwork.IsMessageQueueRunning = true; // lo vuelvo true para evitar problemas
+        PhotonNetwork.IsMessageQueueRunning = true;
         hasRequestedJoinRoom = false;
 
         PhotonNetwork.NickName = "";
         playerNameInput.text = "";
 
         connectButton.onClick.AddListener(OnConnectButtonClicked);
-    }
+        createRoomConfirmButton.onClick.AddListener(OnCreateRoomConfirmed);
+        createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
 
-    void OnJoinButtonClicked()
-    {
-        joinPanel.SetActive(true);
+        joinPanel.SetActive(false);
+        createRoomPanel.SetActive(false);
+
+        // Tomo el RoomListUI desde el panel
+        roomListUI = joinPanel.GetComponent<RoomListUI>();
+        // Asignar slots directamente desde inspector
+        if (roomListUI != null && roomSlots.Length > 0)
+            roomListUI.slots = roomSlots; // slots ahora es [SerializeField] público o privado
     }
 
     void OnConnectButtonClicked()
@@ -32,41 +55,58 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         PhotonNetwork.AutomaticallySyncScene = true;
 
         string playerName = playerNameInput.text.Trim();
-
-        if (string.IsNullOrEmpty(playerName)) // se supone que chequea si tenes nickname, si no tenes no te deberia dejar hacer nada
+        if (string.IsNullOrEmpty(playerName))
         {
-            Debug.LogWarning("sin nickname no entras.");
+            Debug.LogWarning("Sin nickname no entras.");
             return;
         }
 
+        ConnectionManager.Instance.SetNickName(playerName);
 
-        if (!PhotonNetwork.IsConnected) // si no estoy conectado al server pongo el nickname, me conecto y me mete a la room
+        if (!PhotonNetwork.IsConnected)
         {
-            ConnectionManager.Instance.SetNickName(playerNameInput.text);
             ConnectionManager.Instance.ConnectToServer(() =>
             {
-                hasRequestedJoinRoom = true; 
-                PhotonNetwork.JoinRandomOrCreateRoom();
+                Debug.Log("Conectado al servidor. Mostrando lista de rooms...");
+                PhotonNetwork.JoinLobby();
+                connectPanel.SetActive(false);
+                joinPanel.SetActive(true);
             });
         }
         else
         {
-            ConnectionManager.Instance.SetNickName(playerNameInput.text);
-            hasRequestedJoinRoom = true;
-            PhotonNetwork.JoinRandomOrCreateRoom();
+            PhotonNetwork.JoinLobby();
+            connectPanel.SetActive(false);
+            joinPanel.SetActive(true);
         }
     }
 
-    public override void OnJoinedRoom() // se me a la room si antes no hubo otro intento de "acceso"
+    public void OnCreateRoomButtonClicked()
+    {
+        joinPanel.SetActive(false);
+        createRoomPanel.SetActive(true);
+    }
+
+    void OnCreateRoomConfirmed()
+    {
+        string roomName = roomNameInput.text.Trim();
+        if (string.IsNullOrEmpty(roomName))
+        {
+            Debug.LogWarning("El nombre de la sala no puede estar vacío.");
+            return;
+        }
+
+        // Creo la sala con max 4 jugadores
+        ConnectionManager.Instance.CreateRoom(roomName);
+        hasRequestedJoinRoom = true;
+    }
+
+    public override void OnJoinedRoom()
     {
         if (hasRequestedJoinRoom)
         {
-            hasRequestedJoinRoom = false; // lo pongo en falso y cargo la escena
-            SceneManager.LoadScene("Lobby");
-        }
-        else
-        {
-            Debug.LogWarning("Se entró a una Room sin querer.");
+            hasRequestedJoinRoom = false;
+            SceneManager.LoadScene("Lobby"); // el jugador entra al LobbyScene
         }
     }
 }
