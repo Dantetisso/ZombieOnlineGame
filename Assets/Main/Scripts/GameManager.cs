@@ -8,14 +8,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviourPun
 {
-    [SerializeField] private PhotonView playerPrefab;
-    [SerializeField] private Vector3[] spawnPoint;
-    
     public void StartGame() // si es el master carga el nivel
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.LoadLevel("Nivel");   
+            SceneLoader.LoadScene(ScenesEnum.Level); 
         }
     }
 

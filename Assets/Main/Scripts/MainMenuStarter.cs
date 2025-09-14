@@ -45,6 +45,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
         // Tomo el RoomListUI desde el panel
         roomListUI = joinPanel.GetComponent<RoomListUI>();
+        
         // Asignar slots directamente desde inspector
         if (roomListUI != null && roomSlots.Length > 0)
             roomListUI.slots = roomSlots; // slots ahora es [SerializeField] público o privado
@@ -53,6 +54,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
     void OnConnectButtonClicked()
     {
         string playerName = playerNameInput.text.Trim();
+
         if (string.IsNullOrEmpty(playerName))
         {
             Debug.LogWarning("Sin nickname no entras.");
@@ -90,9 +92,10 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         PhotonNetwork.AutomaticallySyncScene = true;
         
         string roomName = roomNameInput.text.Trim();
+
         if (string.IsNullOrEmpty(roomName))
         {
-            roomName = $"{PhotonNetwork.NickName}'s Room"; // si no pones un nombre te pone este por defecto
+            roomName = PhotonNetwork.NickName + "'s Room"; // si no pones un nombre te pone este por defecto
         }
 
         // Creo la sala con max 4 jugadores
@@ -106,7 +109,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         if (hasRequestedJoinRoom)
         {
             hasRequestedJoinRoom = false;
-            SceneManager.LoadScene("Lobby"); // el jugador entra al LobbyScene
+            SceneLoader.LoadScene(ScenesEnum.Lobby); // el jugador entra a la escena del lobby
         }
     }
 }

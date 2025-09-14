@@ -32,6 +32,6 @@ public class RoomLeaver : MonoBehaviourPunCallbacks
 
         PhotonNetwork.AutomaticallySyncScene = false;
         PhotonNetwork.IsMessageQueueRunning = false;
-        SceneManager.LoadScene("menu");
+        SceneLoader.LoadScene(ScenesEnum.MainMenu);
     }
 }

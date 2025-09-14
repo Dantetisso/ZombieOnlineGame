@@ -17,8 +17,9 @@ public class MainMenuScript : MonoBehaviour
    
     void play()
     {
-        SceneManager.LoadScene("Main");
+        SceneLoader.LoadScene(ScenesEnum.RoomList);
     }
+    
     void quit()
     {
         Application.Quit();

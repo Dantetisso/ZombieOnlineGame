@@ -18,12 +18,12 @@ public class VictorySceneController : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.InRoom)
         {
-            MainMenuStarter.hasRequestedJoinRoom = false; // 🔹 Reset antes de salir del Room
+            MainMenuStarter.hasRequestedJoinRoom = false; //  Reset antes de salir del Room
             RoomLeaver.Instance.LeaveRoom();
         }
         else
         {
-            SceneManager.LoadScene("menu");
+            SceneLoader.LoadScene(ScenesEnum.MainMenu);
         }
     }
 
