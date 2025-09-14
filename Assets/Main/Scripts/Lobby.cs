@@ -44,12 +44,12 @@ public class Lobby : MonoBehaviourPunCallbacks
             playerNickNameTexts[i].text = "";
         }
 
-        // Obtengo jugadores conectados
+        // Obtengo jugadores en la room
         Dictionary<int, Player> players = ConnectionManager.Instance.GetPlayersInRoom();
 
         //ordeno los jugadores por actornumber (orden de entrada) 
         List<Player> orderedPlayers = new List<Player>(players.Values);
-        orderedPlayers.Sort((p1, p2) => p1.ActorNumber.CompareTo(p2.ActorNumber));
+        orderedPlayers.Sort((player1, player2) => player1.ActorNumber.CompareTo(player2.ActorNumber));
 
         int index = 0;
         foreach (Player player in orderedPlayers)
