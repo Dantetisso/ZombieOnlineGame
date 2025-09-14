@@ -1133,12 +1133,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cac3c4b62577e94ea2fda250d19dcf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 556956442942914073, guid: ca3db3198d2843245a55855f9d15de6e, type: 3}
-  spawnPoint:
-  - {x: 3, y: 0, z: 0}
-  - {x: -3, y: 0, z: 0}
-  - {x: 0, y: -3, z: 0}
-  - {x: 0, y: 3, z: 0}
 --- !u!114 &1438860079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1990,7 +1984,6 @@ MonoBehaviour:
   - {fileID: 92209457}
   - {fileID: 107265898}
   - {fileID: 1959804682}
-  manager: {fileID: 1438860078}
 --- !u!114 &1971148195
 MonoBehaviour:
   m_ObjectHideFlags: 0

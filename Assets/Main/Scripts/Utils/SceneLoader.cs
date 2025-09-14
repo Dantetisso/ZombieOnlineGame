@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
-public enum ScenesEnum // poner con nombre exacto
+public enum ScenesEnum // poner con nombre exacto de la escena
 {
     MainMenu,
     RoomList,
@@ -14,7 +15,7 @@ public enum ScenesEnum // poner con nombre exacto
     GameOver,
 }
 
-public static class SceneLoader 
+public static class SceneLoader
 {
     public static void LoadScene(ScenesEnum scene)
     {
@@ -24,5 +25,10 @@ public static class SceneLoader
     public static AsyncOperation LoadSceneAsync(ScenesEnum scene)
     {
         return SceneManager.LoadSceneAsync(scene.ToString());
+    }
+
+    public static void LoadSceneByPhoton(ScenesEnum scene)
+    {
+        PhotonNetwork.LoadLevel(scene.ToString());
     }
 }

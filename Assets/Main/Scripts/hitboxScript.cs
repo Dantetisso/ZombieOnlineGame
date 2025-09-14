@@ -10,8 +10,6 @@ public class hitboxScript : MonoBehaviourPunCallbacks
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        // if (!PhotonNetwork.IsMasterClient) return;
-
         if (((1 << collision.gameObject.layer) & stats._attackLayer) != 0)
         {
             PhotonView targetView = collision.gameObject.GetComponent<PhotonView>();
@@ -21,10 +19,9 @@ public class hitboxScript : MonoBehaviourPunCallbacks
             {
                 myView.RPC(nameof(EnemySyncScript.RPC_EnemyDamage), RpcTarget.All, targetView.ViewID, stats._damage); // llamo al rpc del gunsync para dañar a los zombies
             }
+
             Debug.Log(collision);
-           
         }
     }
-  
     
 }

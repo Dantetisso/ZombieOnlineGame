@@ -29,21 +29,12 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         _agent.updateRotation = false;
         _agent.updateUpAxis = false;
         health.maxHealth = _stats._health;
-        var palyer = GameObject.FindGameObjectsWithTag("Player");
-
-        Debug.Log("local var palye4r count: " + palyer.Length);
-
-        for (int i = 0; i < palyer.Length; i++)
-        {
-            _allTargets.Add(palyer[i]);
-        }
     }
+
     void Start()
     {
         if (!photonView.IsMine) return;     // solo el dueño corre la lógica
 
-        ChangeTarget();
-        Debug.Log("player count: " + _allTargets.Count);
         _agent.speed = _stats._speed;
         InitializeFSM();
         InitializeTree();
@@ -56,12 +47,6 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         _fsm.OnExecute();
         _root.Execute();
 
-    }
-
-    public void GetDamage(int damage)
-    {
-        health.TakeDamage(damage);
-        CheckDeath();
     }
 
     void InitializeFSM()
@@ -90,6 +75,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
 
         _fsm.SetInit(idle);
     }
+
     void InitializeTree()
     {
 
@@ -171,6 +157,12 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         Debug.Log("target: " + _target);
     }
 
+    public void GetDamage(int damage)
+    {
+        health.TakeDamage(damage);
+        CheckDeath();
+    }
+
     void CheckDeath()
     {
         if (health.CurrentHealth > 0) return; // si no murio no hagas nada
@@ -186,13 +178,11 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         }
     }
 
-
     [PunRPC]
     void RPC_RequestDeath() // solo el master puede "matar" a los zombies
     {
         if (!PhotonNetwork.IsMasterClient) return;
         CheckDeath();
     }
-
 
 }

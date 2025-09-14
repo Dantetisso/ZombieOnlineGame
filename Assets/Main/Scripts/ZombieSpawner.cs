@@ -7,12 +7,12 @@ using TMPro;
 public class ZombieSpawner : MonoBehaviourPunCallbacks
 {
     [SerializeField] Transform[] spawnPoints;
-    [SerializeField] int maxWaves = 5;
+    [SerializeField] int maxWaves; //5
 
     [Header("Configuración de zombis por ronda")]
-    [SerializeField] int baseZombies = 5;
-    [SerializeField] int zombiesPerRound = 2;
-    [SerializeField] int bossRound = 5;
+    [SerializeField] int baseZombies; //5
+    [SerializeField] int zombiesPerRound; //2
+    [SerializeField] int bossRound; //5
 
     [SerializeField] TMP_Text waveText;
     [SerializeField] TMP_Text aliveText;
@@ -75,6 +75,7 @@ public class ZombieSpawner : MonoBehaviourPunCallbacks
         waveText.text  = $"Round {wave}";
         aliveText.text = alive.ToString();
     }
+
     [PunRPC]
     void RPC_SetAliveUI(int alive)
     {
@@ -84,10 +85,10 @@ public class ZombieSpawner : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_Victory()
     {
-        // SOLO el Master llama a LoadLevel (los demás se sincronizan gracias a AutomaticallySyncScene)
+        // SOLO el Master llama carga el nivel (los demás se sincronizan gracias a AutomaticallySyncScene)
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.LoadLevel("Victory"); // "Victory" debe estar en Build Settings
+            SceneLoader.LoadSceneByPhoton(ScenesEnum.Victory);
         }
     }
 }
