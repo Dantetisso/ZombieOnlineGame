@@ -12,30 +12,35 @@ public class MovementState<T> : State<T>
     NavMeshAgent _agent;
     ZombieView _view;
     List<GameObject> _allTargets;
-    public MovementState( Transform self, List<GameObject> target, NavMeshAgent agent, ZombieView view)
+    
+    public MovementState(Transform self, List<GameObject> target, NavMeshAgent agent, ZombieView view)
     {
         _self = self;
         _allTargets = target;
         _agent = agent;
         _view = view;
     }
+
     public override void Enter()
     {
         base.Enter();
         ChangeTarget();
         _view.Walk(1);
     }
+    
     public override void Execute()
     {
         base.Execute();
-        if (_agent != null) 
+
+        if (_agent != null)
         {
-            if( _target.position != _self.position)
+            if (_target.position != _self.position)
             {
                 _agent.SetDestination(_target.position);
             }
         }
-        if(ConnectionManager.Instance.GetPlayersInRoom().Count != _allTargets.Count)
+
+        if (ConnectionManager.Instance.GetPlayersInRoom().Count != _allTargets.Count)
         {
             Debug.Log("desync");
             RedoList();
@@ -46,6 +51,7 @@ public class MovementState<T> : State<T>
     void ChangeTarget()
     {
         float mindist = Mathf.Infinity;
+        
         foreach (GameObject item in _allTargets)
         {
             if (item == null) continue;

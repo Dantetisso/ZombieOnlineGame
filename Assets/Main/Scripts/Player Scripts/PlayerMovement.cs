@@ -99,12 +99,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 
             ChangeGuns();
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape)) // salir del juego
             {
-                Debug.Log(PhotonNetwork.InRoom + " is on room");
-                RoomLeaver.Instance.LeaveRoom(); 
-
-                //Application.Quit();
+                Application.Quit();
+            }
+            
+            if (Input.GetKeyDown(KeyCode.P)) // salir de la room
+            {
+                Debug.Log("Sali de la room");
+                RoomLeaver.Instance.LeaveRoom();
             }
         }
     }

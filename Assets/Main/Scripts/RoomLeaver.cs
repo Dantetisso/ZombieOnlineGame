@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class RoomLeaver : MonoBehaviourPunCallbacks
 {
     public static RoomLeaver Instance;
+
     private void Awake()
     {
         if (Instance == null)
@@ -23,6 +24,7 @@ public class RoomLeaver : MonoBehaviourPunCallbacks
     public void LeaveRoom()
     {
         Debug.Log("me voy del room");
+        Cursor.visible = true;
         PhotonNetwork.LeaveRoom();
     }
 
