@@ -8,9 +8,8 @@ public class HealthScript : MonoBehaviourPun
 {
     [Header("Health")]
     public int maxHealth = 100;
-
-    [SerializeField] private int currentHealth;
-    public int CurrentHealth => currentHealth;
+    [SerializeField] private int _currentHealth;
+    public int CurrentHealth => _currentHealth;
 
     public event Action<int, int> OnHealthChanged;
 
@@ -19,7 +18,7 @@ public class HealthScript : MonoBehaviourPun
 
     void Start()
     {
-        currentHealth = maxHealth;
+        _currentHealth = maxHealth;
 
         _renderer = GetComponentInChildren<Renderer>();
         if (_renderer != null)
@@ -30,7 +29,7 @@ public class HealthScript : MonoBehaviourPun
 
         if (photonView.IsMine) // solo el dueño le manda a todos para actualizar su vida
         {
-            photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, currentHealth, maxHealth);
+            photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, _currentHealth, maxHealth);
         }
     }
 
@@ -38,20 +37,11 @@ public class HealthScript : MonoBehaviourPun
     {
         if (!photonView.IsMine) return;  // si no esta sincronizado corta aca
 
-        currentHealth -= damage; // x si acaso me aseguro que la vida nunca sea negativa (osea no baje de 0)
-        photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, currentHealth, maxHealth);
+        _currentHealth -= damage; // x si acaso me aseguro que la vida nunca sea negativa (osea no baje de 0)
+        photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, _currentHealth, maxHealth);
         Debug.Log("took damage");
 
         StartCoroutine(FlashRed());
-    }
-
-    private void RPC_FlashRed()
-    {
-        if (_renderer != null)
-        {
-            StopCoroutine(nameof(FlashRed)); // evitar superposición si recibe daño muy rápido
-            StartCoroutine(FlashRed());
-        }
     }
 
     private IEnumerator FlashRed()
@@ -67,32 +57,32 @@ public class HealthScript : MonoBehaviourPun
     {
         if (!photonView.IsMine) return;
 
-        currentHealth = maxHealth;
-        photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.AllBuffered, currentHealth, maxHealth);
+        _currentHealth = maxHealth;
+        photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.AllBuffered, _currentHealth, maxHealth);
     }
 
     public bool IsAlive()
     {
-        return currentHealth > 0;
+        return _currentHealth > 0;
     }
 
     [PunRPC] // rpc para actualizar la vida con evento
     void RPC_UpdateHealth(int newCurrent, int newMax)
     {
-        currentHealth = newCurrent;
+        _currentHealth = newCurrent;
         maxHealth = newMax;
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        OnHealthChanged?.Invoke(_currentHealth, maxHealth);
     }
 
     [PunRPC]
     public void RPC_TakeDamage(int dmg)
     {
-        if (currentHealth <= 0) return;
+        if (_currentHealth <= 0) return;
 
-        currentHealth -= dmg;
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        _currentHealth -= dmg;
+        OnHealthChanged?.Invoke(_currentHealth, maxHealth);
 
-        if (currentHealth <= 0) { Destroy(this); }
+        if (_currentHealth <= 0) { Destroy(this); }
 
     }
 }
