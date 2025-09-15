@@ -11,12 +11,10 @@ public class Lobby : MonoBehaviourPunCallbacks
 {                                               
     [SerializeField] private Button startGameButton;
     [SerializeField] private TMP_Text[] playerNickNameTexts;
-    [SerializeField] private GameManager gameManager;
 
     void Start()
     {
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
-        gameManager = FindObjectOfType<GameManager>();
         EmptyTexts();
 
         if (!photonView.IsMine) startGameButton.gameObject.SetActive(false); // para que el boton de play solo lo pueda ver el master 
@@ -31,10 +29,8 @@ public class Lobby : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            gameManager.StartGame();
+            SceneLoader.LoadScene(ScenesEnum.Level); 
         }
-
-        Debug.Log("<color=green>Botón de play tocado</color>");
     }
 
     private void UpdateTexts()
