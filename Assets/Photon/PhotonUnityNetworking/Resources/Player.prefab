@@ -2023,7 +2023,6 @@ MonoBehaviour:
   cameraFollow: {fileID: 0}
   localHUD: {fileID: 8260476522810903657}
   playerNameText: {fileID: 7493352220643332536}
-  mesenger: {fileID: 0}
 --- !u!114 &84817972951477225
 MonoBehaviour:
   m_ObjectHideFlags: 0

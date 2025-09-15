@@ -6,7 +6,7 @@ using TMPro;
 public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 {
     #region  Variables
-    [Header("Movment")]
+    [Header("Movement")]
     [Range(0, 10)]
     [SerializeField] private float movSpeed = 6f;
     private float horizontal;
@@ -22,7 +22,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     private float evadeDuration = 0.2f;
     [SerializeField] private float evadeCooldown = 2f; // Tiempo de cooldown por carga de esquive
 
-    private Vector2 mousePos;
     private Rigidbody2D rb;
 
     [Header("Interaction")]
@@ -36,7 +35,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [Header("UI")]
     [SerializeField] private GameObject localHUD;
     [SerializeField] private TMP_Text playerNameText;
-    [SerializeField] private TMP_Text mesenger;
     #endregion
 
     #region Metodos
@@ -124,6 +122,21 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             Move();
         }
     }
+
+    void Look()
+    {
+        if (!photonView.IsMine) return; // chequeo x las dudas
+
+        if (mainCamera == null) return;
+
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = transform.position.z;
+
+        Vector2 direction = (mouseWorldPos - transform.position).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+    }
    
     void Move()
     {
@@ -178,21 +191,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         return (float)currentEvades / maxEvades;
     }
 
-    void Look()
-    {
-        if (!photonView.IsMine) return; // chequeo x las dudas
-
-        if (mainCamera == null) return;
-
-        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPos.z = transform.position.z;
-
-        Vector2 direction = (mouseWorldPos - transform.position).normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-
-        transform.rotation = Quaternion.Euler(0, 0, angle);
-    }
-
     private void ONInteract()
     {
         Collider2D[] colliders = Physics2D.OverlapBoxAll(interactPoint.position, new Vector2(1f, 1f), 0f, interactableLayer);
@@ -211,11 +209,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     public void RPC_SetPlayerName(string playerName)
     {
         playerNameText.text = playerName;
-    }
-
-    public void LobbyMesage(string mesage)
-    {
-        mesenger.text = mesage;
     }
 
     public void GetDamage(int damage)
