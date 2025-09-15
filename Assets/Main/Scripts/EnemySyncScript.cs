@@ -10,12 +10,12 @@ public class EnemySyncScript : MonoBehaviour
     {
         PhotonView targetPhotonView = PhotonView.Find(targetViewID);
 
-        Debug.Log($"RPC, ENEMIGO de hacer daño en: <color=cyan>{targetViewID}</color> con un daño de: <color=yellow>{damage}</color>"); // debug para chequear a que le hace daño y cuanto
+        Debug.Log($"RPC ENEMIGO de hacer daño en: <color=cyan>{targetViewID}</color> con un daño de: <color=yellow>{damage}</color>"); // debug para chequear a que le hace daño y cuanto
 
         if (targetPhotonView != null && targetPhotonView.TryGetComponent(out IPlayer damageable))
         {
             damageable.GetDamage(damage);
-            Debug.Log("Recibio dalo mio");
+            Debug.Log("Recibio daño mio");
         }
     }
 }
