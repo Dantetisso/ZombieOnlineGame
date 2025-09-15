@@ -26,15 +26,13 @@ public class HealthScript : MonoBehaviourPun
         _renderer = GetComponentInChildren<Renderer>();
         if (_renderer != null)
         {
-            _renderer.material = new Material(_renderer.material); 
+            _renderer.material = new Material(_renderer.material);
             _originalColor = _renderer.material.color;
         }
 
-        // Sincronizo la vida inicial con todos
+        // Sincroniza la vida inicial
         if (photonView.IsMine)
-        {
             photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, currentHealth, maxHealth);
-        }
     }
 
     public void TakeDamage(int damage)
@@ -56,8 +54,10 @@ public class HealthScript : MonoBehaviourPun
 
     private void HandleDeath()
     {
-        Debug.Log($"{photonView.Owner.NickName}: Died");
-        OnPlayerDied?.Invoke(photonView.Owner);
+        Debug.Log($"{photonView.Owner.NickName} has died.");
+
+        // Notifica la muerte a todos
+        photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered);
     }
 
     private IEnumerator FlashRed()
@@ -69,7 +69,14 @@ public class HealthScript : MonoBehaviourPun
         _renderer.material.color = _originalColor;
     }
 
-    public void ResetHealth() // por si quiero reiniciarle la vida ej: un obj curativo
+    public void InitHealth(int health)
+    {
+        maxHealth = health;
+        currentHealth = maxHealth;
+        isDead = false;
+    }
+
+    public void ResetHealth()
     {
         if (!photonView.IsMine) return;
 
@@ -78,20 +85,19 @@ public class HealthScript : MonoBehaviourPun
         photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.AllBuffered, currentHealth, maxHealth);
     }
 
-    public void InitHealth(int health)
-    {
-        maxHealth = health;
-        currentHealth = maxHealth;
-        isDead = false;
-    }
-
     public bool IsAlive() => !isDead && currentHealth > 0;
 
     [PunRPC]
-    void RPC_UpdateHealth(int newCurrent, int newMax)
+    private void RPC_UpdateHealth(int newCurrent, int newMax)
     {
         currentHealth = newCurrent;
         maxHealth = newMax;
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    [PunRPC]
+    private void RPC_PlayerDied()
+    {
+        OnPlayerDied?.Invoke(photonView.Owner);
     }
 }

@@ -59,6 +59,7 @@ MonoBehaviour:
   - RPC_PlayerTakeDamage
   - RPC_EnemyDamage
   - RPC_UpdateAlivePlayers
+  - RPC_PlayerDied
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

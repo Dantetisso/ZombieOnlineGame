@@ -46,9 +46,9 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         // Tomo el RoomListUI desde el panel
         roomListUI = joinPanel.GetComponent<RoomListUI>();
         
-        // Asignar slots directamente desde inspector
+        // Asignar slots desde inspector
         if (roomListUI != null && roomSlots.Length > 0)
-            roomListUI.slots = roomSlots; // slots ahora es [SerializeField] público o privado
+            roomListUI.slots = roomSlots; 
     }
 
     void OnConnectButtonClicked()
@@ -67,7 +67,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         {
             ConnectionManager.Instance.ConnectToServer(() =>
             {
-                Debug.Log("Conectado al servidor. Mostrando lista de rooms...");
+                Debug.Log("Conectado al servidor. Mostrando rooms...");
                 PhotonNetwork.JoinLobby();
                 connectPanel.SetActive(false);
                 joinPanel.SetActive(true);
