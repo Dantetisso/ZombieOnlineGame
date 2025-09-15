@@ -1,88 +1,97 @@
 using System;
 using System.Collections;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
-[RequireComponent(typeof(PhotonView))] // me aseguro que el objeto tenga el photon view
+[RequireComponent(typeof(PhotonView))]
 public class HealthScript : MonoBehaviourPun
 {
     [Header("Health")]
-    public int maxHealth = 100;
-    [SerializeField] private int _currentHealth;
-    public int CurrentHealth => _currentHealth;
+    public int maxHealth;
+    [SerializeField] private int currentHealth;
+    public int _currentHealth => currentHealth;
 
     public event Action<int, int> OnHealthChanged;
+    public static event Action<Player> OnPlayerDied;
 
     private Renderer _renderer;
     private Color _originalColor;
+    private bool isDead = false;
 
     void Start()
     {
-        _currentHealth = maxHealth;
+        currentHealth = maxHealth;
 
         _renderer = GetComponentInChildren<Renderer>();
         if (_renderer != null)
         {
-            _renderer.material = new Material(_renderer.material); // instancia propia
-            _originalColor = _renderer.material.color; // guardar color original
+            _renderer.material = new Material(_renderer.material); 
+            _originalColor = _renderer.material.color;
         }
 
-        if (photonView.IsMine) // solo el dueño le manda a todos para actualizar su vida
+        // Sincronizo la vida inicial con todos
+        if (photonView.IsMine)
         {
-            photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, _currentHealth, maxHealth);
+            photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, currentHealth, maxHealth);
         }
     }
 
     public void TakeDamage(int damage)
     {
-        if (!photonView.IsMine) return;  // si no esta sincronizado corta aca
+        if (!photonView.IsMine || isDead) return;
 
-        _currentHealth -= damage; // x si acaso me aseguro que la vida nunca sea negativa (osea no baje de 0)
-        photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, _currentHealth, maxHealth);
-        Debug.Log("took damage");
+        currentHealth -= damage;
+        if (currentHealth < 0) currentHealth = 0;
 
+        photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, currentHealth, maxHealth);
         StartCoroutine(FlashRed());
+
+        if (currentHealth <= 0 && !isDead)
+        {
+            isDead = true;
+            HandleDeath();
+        }
+    }
+
+    private void HandleDeath()
+    {
+        Debug.Log($"{photonView.Owner.NickName}: Died");
+        OnPlayerDied?.Invoke(photonView.Owner);
     }
 
     private IEnumerator FlashRed()
     {
+        if (_renderer == null) yield break;
+
         _renderer.material.color = Color.red;
-
         yield return new WaitForSeconds(0.2f);
-
         _renderer.material.color = _originalColor;
     }
 
-    public void ResetHealth() // metodo x si quiero reiniciar la vida
+    public void ResetHealth() // por si quiero reiniciarle la vida ej: un obj curativo
     {
         if (!photonView.IsMine) return;
 
-        _currentHealth = maxHealth;
-        photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.AllBuffered, _currentHealth, maxHealth);
+        currentHealth = maxHealth;
+        isDead = false;
+        photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.AllBuffered, currentHealth, maxHealth);
     }
 
-    public bool IsAlive()
+    public void InitHealth(int health)
     {
-        return _currentHealth > 0;
+        maxHealth = health;
+        currentHealth = maxHealth;
+        isDead = false;
     }
 
-    [PunRPC] // rpc para actualizar la vida con evento
-    void RPC_UpdateHealth(int newCurrent, int newMax)
-    {
-        _currentHealth = newCurrent;
-        maxHealth = newMax;
-        OnHealthChanged?.Invoke(_currentHealth, maxHealth);
-    }
+    public bool IsAlive() => !isDead && currentHealth > 0;
 
     [PunRPC]
-    public void RPC_TakeDamage(int dmg)
+    void RPC_UpdateHealth(int newCurrent, int newMax)
     {
-        if (_currentHealth <= 0) return;
-
-        _currentHealth -= dmg;
-        OnHealthChanged?.Invoke(_currentHealth, maxHealth);
-
-        if (_currentHealth <= 0) { Destroy(this); }
-
+        currentHealth = newCurrent;
+        maxHealth = newMax;
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 }

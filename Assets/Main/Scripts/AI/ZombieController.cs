@@ -28,7 +28,6 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         health = GetComponent<HealthScript>();
         _agent.updateRotation = false;
         _agent.updateUpAxis = false;
-        health.maxHealth = _stats._health;
     }
 
     void Start()
@@ -36,6 +35,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         if (!photonView.IsMine) return;     // solo el dueño corre la lógica
 
         _agent.speed = _stats._speed;
+        health.InitHealth(_stats._health);
         InitializeFSM();
         InitializeTree();
     }
@@ -165,7 +165,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
 
     void CheckDeath()
     {
-        if (health.CurrentHealth > 0) return; // si no murio no hagas nada
+        if (health._currentHealth > 0) return; // si no murio no hagas nada
 
         if (PhotonNetwork.IsMasterClient) // si es el master client destruyo al zombi y aviso al metodo del zombiespawner
         {

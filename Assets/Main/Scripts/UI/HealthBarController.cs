@@ -11,7 +11,7 @@ public class HealthBarController : MonoBehaviour
         if (health != null) // si cambia la vida actualizo la barra
         {
             health.OnHealthChanged += Refresh;
-            Refresh(health.CurrentHealth, health.maxHealth);
+            Refresh(health._currentHealth, health.maxHealth);
         }
     }
 
