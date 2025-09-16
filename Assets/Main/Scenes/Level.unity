@@ -1481,10 +1481,10 @@ MonoBehaviour:
   - {fileID: 1487516850}
   - {fileID: 1542375860}
   - {fileID: 1712899862}
-  maxWaves: 5
+  maxWaves: 3
   baseZombies: 5
-  zombiesPerRound: 2
-  bossRound: 5
+  zombiesPerRound: 1
+  bossRound: 3
   waveText: {fileID: 524750999}
   aliveText: {fileID: 263818255}
 --- !u!4 &705134183
