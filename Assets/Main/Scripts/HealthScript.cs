@@ -55,9 +55,7 @@ public class HealthScript : MonoBehaviourPun
     private void HandleDeath()
     {
         Debug.Log($"{photonView.Owner.NickName} has died.");
-
-        // Notifica la muerte a todos
-        photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered);
+        photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered); // ocultar prefab de jugador y desactivar su script para que no pueda seguir moviendose
     }
 
     private IEnumerator FlashRed()
