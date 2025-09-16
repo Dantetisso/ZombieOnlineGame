@@ -11,6 +11,7 @@ public class HealthScript : MonoBehaviourPun
     public int maxHealth;
     [SerializeField] private int currentHealth;
     public int _currentHealth => currentHealth;
+    [SerializeField] private bool IsPlayer;
 
     public event Action<int, int> OnHealthChanged;
     public static event Action<Player> OnPlayerDied;
@@ -52,12 +53,6 @@ public class HealthScript : MonoBehaviourPun
         }
     }
 
-    private void HandleDeath()
-    {
-        Debug.Log($"{photonView.Owner.NickName} has died.");
-        photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered); // ocultar prefab de jugador y desactivar su script para que no pueda seguir moviendose
-    }
-
     private IEnumerator FlashRed()
     {
         if (_renderer == null) yield break;
@@ -84,6 +79,17 @@ public class HealthScript : MonoBehaviourPun
     }
 
     public bool IsAlive() => !isDead && currentHealth > 0;
+    
+    private void HandleDeath()
+    {
+        Debug.Log($"{photonView.Owner.NickName} has died.");
+
+        if (IsPlayer)
+        {
+            photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered); // ocultar prefab de jugador y desactivar su script para que no pueda seguir moviendose
+        }
+        else { } // meter logica para zombis
+    }
 
     [PunRPC]
     private void RPC_UpdateHealth(int newCurrent, int newMax)

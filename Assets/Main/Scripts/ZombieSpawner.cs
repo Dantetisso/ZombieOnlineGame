@@ -1,94 +1,81 @@
+using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
-using Unity.Mathematics;
-using System.Collections.Generic;
-using TMPro;
 
-public class ZombieSpawner : MonoBehaviourPunCallbacks
+/// Se encarga de instanciar zombis según la ronda y notificar al GameManager cuando mueren.
+public class ZombieSpawner : MonoBehaviourPun
 {
-    [SerializeField] Transform[] spawnPoints;
-    [SerializeField] int maxWaves; //5
+    [Header("Puntos de Spawn")]
+    [SerializeField] private Transform[] spawnPoints;
 
-    [Header("Configuración de zombis por ronda")]
-    [SerializeField] int baseZombies; //5
-    [SerializeField] int zombiesPerRound; //2
-    [SerializeField] int bossRound; //5
+    [Header("Referencia a GameManager")]
+    [SerializeField] private GameManager gameManager;
 
-    [SerializeField] TMP_Text waveText;
-    [SerializeField] TMP_Text aliveText;
+    // Guarda por ID si el zombi es boss para informar al manager
+    private readonly Dictionary<int, bool> isBossByID = new();
 
-    int currentWave;
-    int zombiesAlive;
-
-    readonly Dictionary<int, bool> isBossByID = new();
-
-    void Start()
+    #region Unity Callbacks
+    private void OnEnable()
     {
-        if (PhotonNetwork.IsMasterClient) StartNextWave();
+        GameManager.OnWaveStarted += SpawnWave;
     }
 
-    void StartNextWave()
+    private void OnDisable()
     {
-        currentWave++;
-        if (currentWave > maxWaves) return;
+        GameManager.OnWaveStarted -= SpawnWave;
+    }
+    #endregion
 
-        bool bossWave = currentWave % bossRound == 0;
-        int amount    = bossWave ? 1 : baseZombies + (currentWave - 1) * zombiesPerRound;
-
-        zombiesAlive = amount;
+    #region Spawn Logic
+    private void SpawnWave(int wave, int amount, bool bossWave)
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+        if (spawnPoints == null || spawnPoints.Length == 0)
+        {
+            Debug.LogWarning("No hay puntos de spawn asignados en ZombieSpawner.");
+            return;
+        }
 
         for (int i = 0; i < amount; i++)
         {
-            string prefab = bossWave ? "boss" : "zombie";
-            Vector3 pos   = spawnPoints[i % spawnPoints.Length].position;
+            string prefabName = bossWave ? "boss" : "zombie";
+            Vector3 spawnPos = spawnPoints[i % spawnPoints.Length].position;
 
-            GameObject go = PhotonNetwork.Instantiate(prefab, pos, quaternion.identity);
-            int id        = go.GetComponent<PhotonView>().ViewID;
-            isBossByID[id] = bossWave;          // true si es boss
+            GameObject go = PhotonNetwork.Instantiate(prefabName, spawnPos, Quaternion.identity);
+
+            if (go.TryGetComponent<PhotonView>(out PhotonView pv))
+            {
+                isBossByID[pv.ViewID] = bossWave;
+            }
+            else
+            {
+                Debug.LogError($"El prefab {prefabName} no tiene PhotonView!");
+            }
         }
-
-        photonView.RPC(nameof(RPC_SetWaveUI), RpcTarget.AllBuffered, currentWave, zombiesAlive);
     }
+    #endregion
 
+    #region Zombie Death
+    /// Llamar desde el zombi cuando muere.
     public void OnZombieDied(int viewID)
     {
         if (!PhotonNetwork.IsMasterClient) return;
 
-        zombiesAlive--;
-        bool wasBoss = isBossByID.TryGetValue(viewID, out bool bossFlag) && bossFlag;
-        isBossByID.Remove(viewID);
-
-        if (wasBoss)
+        bool wasBoss = false;
+        if (isBossByID.TryGetValue(viewID, out bool bossFlag))
         {
-            photonView.RPC(nameof(RPC_Victory), RpcTarget.All);
-            return;
+            wasBoss = bossFlag;
+            isBossByID.Remove(viewID);
         }
 
-        photonView.RPC(nameof(RPC_SetAliveUI), RpcTarget.All, zombiesAlive);
-
-        if (zombiesAlive <= 0) StartNextWave();
-    }
-
-    [PunRPC]
-    void RPC_SetWaveUI(int wave, int alive)
-    {
-        waveText.text  = $"Round {wave}";
-        aliveText.text = alive.ToString();
-    }
-
-    [PunRPC]
-    void RPC_SetAliveUI(int alive)
-    {
-        aliveText.text = alive.ToString();
-    }
-
-    [PunRPC]
-    void RPC_Victory()
-    {
-        // SOLO el Master llama carga el nivel (los demás se sincronizan gracias a AutomaticallySyncScene)
-        if (PhotonNetwork.IsMasterClient)
+        if (gameManager != null)
         {
-            SceneLoader.LoadSceneByPhoton(ScenesEnum.Victory);
+            gameManager.OnZombieDied(wasBoss);
+        }
+        else
+        {
+            Debug.LogError("GameManager no asignado en ZombieSpawner!");
         }
     }
+    #endregion
 }

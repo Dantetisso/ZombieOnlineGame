@@ -345,8 +345,6 @@ GameObject:
   - component: {fileID: 1438860077}
   - component: {fileID: 1438860076}
   - component: {fileID: 1438860075}
-  - component: {fileID: 1438860078}
-  - component: {fileID: 1438860079}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -404,46 +402,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1438860078
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1438860074}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cac3c4b62577e94ea2fda250d19dcf4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 556956442942914073, guid: ca3db3198d2843245a55855f9d15de6e, type: 3}
-  spawnPoint:
-  - {x: 3, y: 0, z: 0}
-  - {x: -3, y: 0, z: 0}
-  - {x: 0, y: -3, z: 0}
-  - {x: 0, y: 3, z: 0}
---- !u!114 &1438860079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1438860074}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 2
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &1638601607
 GameObject:
   m_ObjectHideFlags: 0
@@ -975,7 +933,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1971148189}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 279b61624f22d5a4296e63b3ad6bfddc, type: 3}
+  m_Script: {fileID: 11500000, guid: cdf755e3d5edb9a42a5c6b001ef2a35c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   backToMenu: {fileID: 1826726116}
