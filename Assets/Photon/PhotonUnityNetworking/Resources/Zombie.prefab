@@ -344,8 +344,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stats: {fileID: 11400000, guid: 7d1bbd6f42f7d2d44a2e94569c8ee526, type: 2}
-  _target: {fileID: 8869895996242752674, guid: ca3db3198d2843245a55855f9d15de6e, type: 3}
-  _allTargets: []
 --- !u!114 &4367403749330729693
 MonoBehaviour:
   m_ObjectHideFlags: 0

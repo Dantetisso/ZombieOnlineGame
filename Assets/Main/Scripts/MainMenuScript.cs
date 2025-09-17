@@ -12,14 +12,14 @@ public class MainMenuScript : MonoBehaviourPunCallbacks
     [SerializeField] Button playButton;
     [SerializeField] Button soloButton;
     [SerializeField] Button quitButton;
-    
+
     void Start()
     {
         playButton.onClick.AddListener(Play);
         soloButton.onClick.AddListener(PlaySolo);
         quitButton.onClick.AddListener(quit);
     }
-   
+
     void Play()
     {
         SceneLoader.LoadScene(ScenesEnum.RoomList);
@@ -31,9 +31,19 @@ public class MainMenuScript : MonoBehaviourPunCallbacks
         PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 1 });
         SceneLoader.LoadSceneByPhoton(ScenesEnum.Level);
     }
-    
+
     void quit()
     {
         Application.Quit();
+    }
+    
+    void OnDestroy()
+    {
+        if (playButton != null)
+            playButton.onClick.RemoveAllListeners();
+        if (soloButton != null)
+            soloButton.onClick.RemoveAllListeners();
+        if (quitButton != null)
+            quitButton.onClick.RemoveAllListeners();
     }
 }

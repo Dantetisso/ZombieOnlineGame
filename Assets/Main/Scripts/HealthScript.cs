@@ -31,7 +31,6 @@ public class HealthScript : MonoBehaviourPun
             _originalColor = _renderer.material.color;
         }
 
-        // Sincroniza la vida inicial
         if (photonView.IsMine)
             photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, currentHealth, maxHealth);
     }
@@ -79,16 +78,13 @@ public class HealthScript : MonoBehaviourPun
     }
 
     public bool IsAlive() => !isDead && currentHealth > 0;
-    
+
     private void HandleDeath()
     {
-        Debug.Log($"{photonView.Owner.NickName} has died.");
-
         if (IsPlayer)
-        {
-            photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered); // ocultar prefab de jugador y desactivar su script para que no pueda seguir moviendose
-        }
-        else { } // meter logica para zombis
+            photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered);
+        else
+            photonView.RPC(nameof(RPC_ZombieDied), RpcTarget.MasterClient, photonView.ViewID);
     }
 
     [PunRPC]
@@ -103,5 +99,15 @@ public class HealthScript : MonoBehaviourPun
     private void RPC_PlayerDied()
     {
         OnPlayerDied?.Invoke(photonView.Owner);
+    }
+
+    [PunRPC]
+    private void RPC_ZombieDied(int viewID)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            FindObjectOfType<ZombieSpawner>().OnZombieDied(viewID);
+            PhotonNetwork.Destroy(gameObject);
+        }
     }
 }

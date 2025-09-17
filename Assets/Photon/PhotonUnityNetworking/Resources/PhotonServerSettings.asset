@@ -60,6 +60,10 @@ MonoBehaviour:
   - RPC_EnemyDamage
   - RPC_UpdateAlivePlayers
   - RPC_PlayerDied
+  - RPC_ZombieDied
+  - RPC_StartWave
+  - RPC_UpdateZombiesAlive
+  - RPC_UpdateWaveInfo
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

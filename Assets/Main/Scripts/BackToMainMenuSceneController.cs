@@ -1,26 +1,29 @@
 using UnityEngine;
 using UnityEngine.UI;
-using Photon;
 using Photon.Pun;
 
 public class BackToMainMenuSceneController : MonoBehaviourPunCallbacks
 {
-    [SerializeField] private Button backToMenu; // script para pantalla de victoria y derrota
+    [SerializeField] private Button backToMenu; // botón para volver al menú
 
     void Start()
     {
-        backToMenu.onClick.AddListener(ReturnToMainMenu);
+        // Activar cursor siempre al iniciar la escena
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        if (backToMenu != null)
+            backToMenu.onClick.AddListener(ReturnToMainMenu);
     }
 
     private void ReturnToMainMenu()
     {
-        if (PhotonNetwork.OfflineMode) { PhotonNetwork.OfflineMode = false;} // preguntar profesor x esto para manejar "modo offline"
+        if (PhotonNetwork.OfflineMode) 
+            PhotonNetwork.OfflineMode = false; // desactivar modo offline al volver al menú
 
         if (PhotonNetwork.InRoom)
         {
-            MainMenuStarter.hasRequestedJoinRoom = false; //  Reset antes de salir del Room
+            MainMenuStarter.hasRequestedJoinRoom = false; // reset antes de salir del Room
             RoomLeaver.Instance.LeaveRoom();
         }
         else

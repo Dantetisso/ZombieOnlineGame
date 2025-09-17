@@ -17,21 +17,26 @@ public class RoomListUI : MonoBehaviour
     [Header("Slots de salas")]
     [SerializeField] public RoomSlot[] slots; 
 
-    private void OnEnable() // se llama cuando se activa el GAMEOBJECT que tiene este script y se suscrube al evento OnNewRoomCreated basicamente para actualizar la lista de rooms
+    private void OnEnable()
     {
         if (ConnectionManager.Instance != null)
-            ConnectionManager.Instance.photonManager.OnNewRoomCreated += UpdateRoomList;
+            ConnectionManager.Instance.photonManager.OnNewRoomCreated += SafeUpdateRoomList;
     }
 
     private void OnDisable()
     {
-        if (ConnectionManager.Instance != null) // lo contrario al OnEnable
-            ConnectionManager.Instance.photonManager.OnNewRoomCreated -= UpdateRoomList;
+        if (ConnectionManager.Instance != null)
+            ConnectionManager.Instance.photonManager.OnNewRoomCreated -= SafeUpdateRoomList;
+    }
+
+    private void SafeUpdateRoomList(List<RoomInfo> rooms) // asegurar de limpiar suscripciones 
+    {
+        if (this == null || gameObject == null) return;
+        UpdateRoomList(rooms);
     }
 
     public void UpdateRoomList(List<RoomInfo> rooms)
     {
-        // primero "inicializa" los slots
         for (int i = 0; i < slots.Length; i++)
         {
             slots[i].roomNameText.text = "Empty";
@@ -40,7 +45,6 @@ public class RoomListUI : MonoBehaviour
             slots[i].joinButton.onClick.RemoveAllListeners();
         }
 
-        // y los llena con las rooms disponibles
         for (int i = 0; i < rooms.Count && i < slots.Length; i++)
         {
             RoomInfo room = rooms[i];
@@ -49,15 +53,18 @@ public class RoomListUI : MonoBehaviour
             slot.roomNameText.text = room.Name;
             slot.playerCountText.text = $"{room.PlayerCount}/{room.MaxPlayers}";
 
-            if (room.PlayerCount < room.MaxPlayers) // si la cantidad de jugadores es menor al maximo
+            if (room.PlayerCount < room.MaxPlayers)
             {
-                slot.joinButton.gameObject.SetActive(true); // prende el boton de join y lo hace interactuable
+                slot.joinButton.gameObject.SetActive(true);
                 slot.joinButton.interactable = true;
                 slot.joinButton.onClick.RemoveAllListeners();
                 slot.joinButton.onClick.AddListener(() =>
                 {
-                    ConnectionManager.Instance.JoinSelectedRoom(room.Name);     // y te une a esa room
-                    MainMenuStarter.hasRequestedJoinRoom = true;
+                    if (ConnectionManager.Instance != null)
+                    {
+                        ConnectionManager.Instance.JoinSelectedRoom(room.Name);
+                        MainMenuStarter.hasRequestedJoinRoom = true;
+                    }
                 });
             }
         }

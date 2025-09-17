@@ -7,10 +7,12 @@ public class MessageBroadcaster : MonoBehaviourPun // se encarga de conectar el 
 {
     public static MessageBroadcaster Instance;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance == null)
             Instance = this;
+        else
+            Destroy(gameObject);
     }
 
     public void BroadcastMessageToAll(string msg)

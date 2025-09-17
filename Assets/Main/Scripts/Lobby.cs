@@ -4,11 +4,10 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Lobby : MonoBehaviourPunCallbacks  
-{                                               
+{
     [SerializeField] private Button startGameButton;
     [SerializeField] private TMP_Text[] playerNickNameTexts;
 
@@ -17,15 +16,19 @@ public class Lobby : MonoBehaviourPunCallbacks
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         EmptyTexts();
 
-        if (!photonView.IsMine) startGameButton.gameObject.SetActive(false); // para que el boton de play solo lo pueda ver el master 
+        if (!photonView.IsMine) startGameButton.gameObject.SetActive(false);
 
-        ConnectionManager.Instance.OnJoinRoom += UpdateTexts;
-        ConnectionManager.Instance.OnPlayerEnterRoom += UpdateTexts;
-        ConnectionManager.Instance.OnPlayerLeaveRoom += UpdateTexts;
+        if (ConnectionManager.Instance != null)
+        {
+            ConnectionManager.Instance.OnJoinRoom += SafeUpdateTexts;
+            ConnectionManager.Instance.OnPlayerEnterRoom += SafeUpdateTexts;
+            ConnectionManager.Instance.OnPlayerLeaveRoom += SafeUpdateTexts;
+        }
+
         UpdateTexts();
     }
 
-    void OnStartGameButtonClicked() // al apretar el boton empieza el juego
+    void OnStartGameButtonClicked()
     {
         if (PhotonNetwork.IsMasterClient)
         {
@@ -33,19 +36,20 @@ public class Lobby : MonoBehaviourPunCallbacks
         }
     }
 
+    private void SafeUpdateTexts()
+    {
+        if (this == null || gameObject == null) return;
+        UpdateTexts();
+    }
+
     private void UpdateTexts()
     {
         for (int i = 0; i < playerNickNameTexts.Length; i++)
-        {
             playerNickNameTexts[i].text = "";
-        }
 
-        // Obtengo jugadores en la room
-        Dictionary<int, Player> players = ConnectionManager.Instance.GetPlayersInRoom();
-
-        //ordeno los jugadores por actornumber (orden de entrada) 
+        Dictionary<int, Player> players = ConnectionManager.Instance?.GetPlayersInRoom() ?? new Dictionary<int, Player>();
         List<Player> orderedPlayers = new List<Player>(players.Values);
-        orderedPlayers.Sort((player1, player2) => player1.ActorNumber.CompareTo(player2.ActorNumber));
+        orderedPlayers.Sort((a, b) => a.ActorNumber.CompareTo(b.ActorNumber));
 
         int index = 0;
         foreach (Player player in orderedPlayers)
@@ -57,28 +61,23 @@ public class Lobby : MonoBehaviourPunCallbacks
             }
         }
 
-        // Habilito el botón solo si hay entre 2 y 4 jugadores
-        int count = orderedPlayers.Count;
-        startGameButton.interactable = count >= 2 && count <= 4;
+        startGameButton.interactable = orderedPlayers.Count >= 2 && orderedPlayers.Count <= 4;
 
-        Debug.Log($"[Lobby] Jugadores en la sala: {count}");
+        Debug.Log($"[Lobby] Jugadores en la sala: {orderedPlayers.Count}");
     }
 
     void EmptyTexts()
     {
         for (int i = 0; i < playerNickNameTexts.Length; i++)
-        {
             playerNickNameTexts[i].text = "";
-        }
     }
 
-    void OnDestroy() // desuscribiendose para que cuando un jugador salga de la partida no siga llamando a los eventos y se rompa todo
+    void OnDestroy()
     {
         if (ConnectionManager.Instance == null) return;
 
-        ConnectionManager.Instance.OnJoinRoom        -= UpdateTexts;
-        ConnectionManager.Instance.OnPlayerEnterRoom -= UpdateTexts;
-        ConnectionManager.Instance.OnPlayerLeaveRoom -= UpdateTexts;
+        ConnectionManager.Instance.OnJoinRoom        -= SafeUpdateTexts;
+        ConnectionManager.Instance.OnPlayerEnterRoom -= SafeUpdateTexts;
+        ConnectionManager.Instance.OnPlayerLeaveRoom -= SafeUpdateTexts;
     }
-    
 }

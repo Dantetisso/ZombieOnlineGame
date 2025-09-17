@@ -330,6 +330,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 0
   currentHealth: 0
+  IsPlayer: 0
 --- !u!114 &2606976743667506008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,8 +344,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stats: {fileID: 11400000, guid: 3325ff33bc1267d4cbcf356485d7b728, type: 2}
-  _target: {fileID: 8869895996242752674, guid: ca3db3198d2843245a55855f9d15de6e, type: 3}
-  _allTargets: []
 --- !u!114 &4367403749330729693
 MonoBehaviour:
   m_ObjectHideFlags: 0

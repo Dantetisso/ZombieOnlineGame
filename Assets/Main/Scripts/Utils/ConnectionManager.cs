@@ -19,14 +19,14 @@ public class ConnectionManager : MonoBehaviourPunCallbacks // conecta entre el j
 
     void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
+        if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
         }
 
         PhotonNetwork.AutomaticallySyncScene = true; // para que le cargue a todos los jugadores a la vez

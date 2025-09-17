@@ -15,7 +15,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
     [SerializeField] private Button connectButton;
 
     [Header("Panels")]
-    [SerializeField] private GameObject connectPanel; 
+    [SerializeField] private GameObject connectPanel;
     [SerializeField] private GameObject joinPanel;       // panel de rooms
     [SerializeField] private GameObject createRoomPanel; // panel para crear room
     [SerializeField] private Button createRoomButton;
@@ -45,10 +45,10 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
         // Tomo el RoomListUI desde el panel
         roomListUI = joinPanel.GetComponent<RoomListUI>();
-        
+
         // Asignar slots desde inspector
         if (roomListUI != null && roomSlots.Length > 0)
-            roomListUI.slots = roomSlots; 
+            roomListUI.slots = roomSlots;
     }
 
     void OnConnectButtonClicked()
@@ -65,12 +65,18 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
         if (!PhotonNetwork.IsConnected)
         {
+            // Guardamos una referencia local de este objeto
+            var self = this;
+
             ConnectionManager.Instance.ConnectToServer(() =>
             {
+                // Chequeamos si el objeto sigue existiendo
+                if (self == null || self.gameObject == null) return;
+
                 Debug.Log("Conectado al servidor. Mostrando rooms...");
                 PhotonNetwork.JoinLobby();
-                connectPanel.SetActive(false);
-                joinPanel.SetActive(true);
+                self.connectPanel.SetActive(false);
+                self.joinPanel.SetActive(true);
             });
         }
         else
@@ -90,7 +96,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
     void OnCreateRoomConfirmed()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
-        
+
         string roomName = roomNameInput.text.Trim();
 
         if (string.IsNullOrEmpty(roomName))
@@ -111,5 +117,17 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
             hasRequestedJoinRoom = false;
             SceneLoader.LoadScene(ScenesEnum.Lobby); // el jugador entra a la escena del lobby
         }
+    }
+
+    void OnDestroy()
+    {
+        if (connectButton != null)
+            connectButton.onClick.RemoveAllListeners();
+
+        if (createRoomConfirmButton != null)
+            createRoomConfirmButton.onClick.RemoveAllListeners();
+
+        if (createRoomButton != null)
+            createRoomButton.onClick.RemoveAllListeners();
     }
 }

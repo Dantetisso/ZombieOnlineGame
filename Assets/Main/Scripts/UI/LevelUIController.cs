@@ -26,7 +26,6 @@ public class LevelUIController : MonoBehaviour
 
     private void Start()
     {
-        // Inicializa UI si ya hay una ronda en curso
         if (gameManager != null && gameManager.CurrentWave > 0)
         {
             waveText.text = "Round: " + gameManager.CurrentWave;
@@ -36,8 +35,8 @@ public class LevelUIController : MonoBehaviour
 
     private void HandleWaveStarted(int wave, int amount, bool bossWave)
     {
-        waveText.text = $"Round: {wave}" + (bossWave ? " - Boss!" : "");
-        zombieCountText.text = "Zombies: " + gameManager.ZombiesAlive;
+        waveText.text = $"Round: {wave}";
+        zombieCountText.text = "Zombies: " + amount;
     }
 
     private void HandleVictory()
@@ -48,7 +47,7 @@ public class LevelUIController : MonoBehaviour
 
     public void UpdateAliveCount(int alive)
     {
-        zombieCountText.text = "Zombies: " + gameManager.ZombiesAlive;
+        zombieCountText.text = "Zombies: " + alive;
     }
 
     private void UpdateAlivePlayers(int count)
