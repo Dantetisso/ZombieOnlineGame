@@ -34,25 +34,6 @@ public class PlayerGunSync : MonoBehaviourPun // este script es para que se pued
     }
 
     [PunRPC]
-    public void RPC_ChangeGun(int id)
-    {
-        Gun[] guns = GetComponentsInChildren<Gun>(true);
-        for (int i = 0; i < guns.Length; i++)
-        {
-            guns[i].gameObject.SetActive(i == id);
-        }
-
-        // Actualiza UI si es el jugador local
-        PlayerUIController ui = GetComponentInChildren<PlayerUIController>();
-        if (photonView.IsMine && ui != null)
-        {
-            Gun activeGun = GetActiveGun();
-            if (activeGun != null)
-                ui.InitGun(activeGun);
-        }
-    }
-
-    [PunRPC]
     public void RPC_MakeDamage(int targetViewID, int damage)
     {
         PhotonView targetPhotonView = PhotonView.Find(targetViewID);

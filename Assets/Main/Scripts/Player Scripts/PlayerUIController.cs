@@ -73,6 +73,11 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
             myGun.OnAmmoChange += UpdateAmmoText; // Agrego listener del arma actual
             UpdateAmmoText(myGun._currentAmmo, myGun._maxAmmo); // Actualizo UI inmediatamente
         }
+        else
+        {
+            // Si no hay arma activa, limpia el texto
+            ammoCountText.text = "0 / 0";
+        }
     }
 
     void UpdateHealthBar(int current, int max)
@@ -87,6 +92,6 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
 
     private void UpdateAmmoText(int clip, int reserve)
     {
-        ammoCountText.text = $"{clip} / {reserve}";
+        ammoCountText.text = clip + " / " + reserve;
     }
 }

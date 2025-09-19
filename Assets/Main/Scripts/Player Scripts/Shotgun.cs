@@ -9,7 +9,7 @@ public class Shotgun : Gun
         if (Input.GetKeyDown(KeyCode.Mouse0) && currentAmmo > 0)
         {
             Shoot();
-            Debug.Log("Escopeta TIRANDO");
+            Debug.Log("<color=green>" + this.name + "</color>" + " Tirando");
         }
     }
 
@@ -18,7 +18,7 @@ public class Shotgun : Gun
         if (maxAmmo > 0 && Input.GetKeyDown(KeyCode.R))
         {
             Reload();
-            Debug.Log("Recarga Escopeta");
+            Debug.Log("<color=green>" + this.name + "</color>" + " Recargando");
         } 
     }
 

@@ -49,37 +49,52 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         currentEvades = maxEvades;
         mainCamera = Camera.main;
 
-        if (photonView.IsMine)
+        if (photonView.IsMine || !PhotonNetwork.IsConnected)
         {
-            cameraFollow = mainCamera.GetComponent<CameraWork>();
-            localHUD.SetActive(true);
-
-            if (cameraFollow != null)
-            {
-                cameraFollow.SetPlayer(transform);  // Asigna la cámara para el jugador local
-            }
-            else
-            {
-                Debug.LogError("No esta el script CameraWork en la main camera.");
-            }
-
-            photonView.RPC("RPC_SetPlayerName", RpcTarget.AllBuffered, PhotonNetwork.NickName); // llamo al rpc para setearle el nombre al player
+            SetupLocalPlayer();
+            
+            var gun = GetComponentInChildren<Gun>();
+            activeGun = gun;           // importante asignarlo primero
+            OnChangeGun?.Invoke(activeGun); // dispara evento a UI
         }
         else
         {
-            Camera camera = GetComponentInChildren<Camera>();
+            SetupRemotePlayer();
+        }
+    }
 
-            if (camera != null)
-            {
-                camera.gameObject.SetActive(false); // Desactiva la cámara del jugador remoto
-            }
+    private void SetupLocalPlayer()
+    {
+        cameraFollow = mainCamera.GetComponent<CameraWork>();
 
-            localHUD.SetActive(false);
+        localHUD.SetActive(true);
+
+        if (cameraFollow != null)
+        {
+            cameraFollow.SetPlayer(transform);
+        }
+        else
+        {
+            Debug.LogError("No esta el script CameraWork en la main camera.");
         }
 
-        Gun gun = GetComponentInChildren<Gun>();  // obtengo el arma
-        PlayerUIController ui = GetComponentInChildren<PlayerUIController>(); // y el script de la UI
-        ui.InitGun(gun);   // y seteo
+        photonView.RPC("RPC_SetPlayerName", RpcTarget.AllBuffered, PhotonNetwork.NickName);
+
+        // Inicializa UI local
+        PlayerUIController ui = localHUD.GetComponent<PlayerUIController>();
+        Gun gun = GetComponentInChildren<Gun>();
+
+        if (ui != null && gun != null) ui.InitGun(gun);
+    }
+
+    private void SetupRemotePlayer()
+    {
+        Camera camera = GetComponentInChildren<Camera>();
+
+        if (camera != null) camera.gameObject.SetActive(false);
+
+        localHUD.SetActive(false);
+
     }
     
     void Update()
@@ -167,37 +182,58 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     }
 
     void ChangeGuns()
+{
+    if (Input.GetKeyDown(KeyCode.Alpha1))
+        ChangeGunWithSync(GunEnum.AutomaticRifle);
+    if (Input.GetKeyDown(KeyCode.Alpha2))
+        ChangeGunWithSync(GunEnum.Shotgun);
+}
+
+    private void ChangeGunWithSync(GunEnum type)
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-            ChangeGun(GunEnum.AutomaticRifle);
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-            ChangeGun(GunEnum.Shotgun);
+        
+        photonView.RPC(nameof(RPC_ChangeGun), RpcTarget.AllBuffered, type);
+        
+      /*  else
+        {
+            ChangeGun(type);
+        }*/
     }
 
-    public void ChangeGun(GunEnum type)
+    void ChangeGun(GunEnum type)
     {
+        Gun newGun = null;
+
         foreach (var gun in guns)
         {
-            if (gun != null)
-            {
-                bool active = gun.gunEnum == type;
-                gun.gameObject.SetActive(active);
+            if (gun == null) continue;
+            gun.gameObject.SetActive(gun.gunEnum == type);
 
-                if (active)
-                {
-                    activeGun = gun;
-                    OnChangeGun?.Invoke(gun);
-                }
+            if (gun.gunEnum == type)
+            {
+                newGun = gun;
             }
         }
-        
-        // Actualizar UI
-        var ui = GetComponentInChildren<PlayerUIController>();
-        ui?.InitGun(activeGun);
-    }
-    
-    public Gun GetActiveGun() => activeGun;
 
+        if (newGun != null)
+        {
+            activeGun = newGun;
+            OnChangeGun?.Invoke(activeGun);
+
+            // Solo actualizamos UI local
+            if (photonView.IsMine || !PhotonNetwork.IsConnected)
+            {
+                var ui = GetComponentInChildren<PlayerUIController>();
+                ui?.InitGun(activeGun);
+            }
+        }
+    }
+
+    [PunRPC]
+    void RPC_ChangeGun(GunEnum type)
+    {
+        ChangeGun(type);
+    }
 
     IEnumerator EndEvade()
     {

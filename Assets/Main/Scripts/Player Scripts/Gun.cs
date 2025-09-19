@@ -30,8 +30,8 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     public int _currentAmmo => currentAmmo;
     public int _maxAmmo => maxAmmo;
     private bool IsReloading;
-    private float nextFireTime;
-   [HideInInspector] public GunEnum gunEnum;
+    protected float nextFireTime;
+    [HideInInspector] public GunEnum gunEnum;
 
     public event Action<int, int> OnAmmoChange;
     private PhotonView playerPhotonView; // cacheo para no buscar cada disparo
@@ -113,8 +113,7 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
 
     public virtual void Reload()
     {
-        if (IsReloading || maxAmmo <= 0 || currentAmmo == ammoClip)
-            return;
+        if (IsReloading || maxAmmo <= 0 || currentAmmo == ammoClip) return;
 
         IsReloading = true;
 
@@ -137,17 +136,6 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     {
         currentAmmo = gunData._clipAmmo;
         maxAmmo = gunData._maxAmmo;
-    }
-
-    protected void NotifyAmmoChange()
-    {
-        OnAmmoChange?.Invoke(currentAmmo, maxAmmo);
-    }
-
-    public virtual void ResetFireState()
-    {
-        nextFireTime = Time.time; // para que no se dispare instantáneamente
-                                  // si tu arma tiene flags de disparo, resetearlos aquí también
     }
 
     IEnumerator MuzzleFlashRoutine()
