@@ -24,87 +24,90 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
 
     private Vector2 mousePos;
     private Vector2 startPos;
+
     protected int currentAmmo;
     protected int maxAmmo;
     protected int ammoClip;
     public int _currentAmmo => currentAmmo;
     public int _maxAmmo => maxAmmo;
-    private bool IsReloading;
     protected float nextFireTime;
+    protected bool IsReloading;
+    protected float lastFireTime;
     [HideInInspector] public GunEnum gunEnum;
 
     public event Action<int, int> OnAmmoChange;
-    private PhotonView playerPhotonView; // cacheo para no buscar cada disparo
-    private Coroutine flashCoroutine;    // para controlar la corutina del flash
+
+    protected PhotonView playerPhotonView; // protegido para subclases
+    private Coroutine flashCoroutine;
     #endregion
 
-    #region Metodos de Unity
-
+    #region Unity
     protected virtual void Start()
     {
-        // Inicializo munición
         ammoClip = gunData._clipAmmo;
         currentAmmo = ammoClip;
         maxAmmo = gunData._maxAmmo;
         gunEnum = gunData._gunType;
 
-        OnAmmoChange?.Invoke(currentAmmo, maxAmmo);
+        NotifyAmmoChange();
 
-        // ------------------------ Apago el flash al inicio ------------------------ //
         if (muzzleFlash != null)
             muzzleFlash.enabled = false;
 
-        // obtengo el PhotonView del player (porque el arma es hijo del objeto player donde tengo el photon view)
         playerPhotonView = transform.root.GetComponent<PhotonView>();
     }
 
-    void Update()
+    protected virtual void Update()
     {
         if (!photonView.IsMine) return;
-
-        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        startPos = shootPoint.position;
 
         HandleShooting();
         HandleReloading();
     }
     #endregion
 
-    #region Metodos
+    #region Métodos
     public abstract void HandleShooting();
     public abstract void HandleReloading();
 
-    public void Shoot()
+    public virtual void Shoot()
     {
-        if (IsReloading) return;
+        if (IsReloading || currentAmmo <= 0) return;
 
         currentAmmo--;
-        OnAmmoChange?.Invoke(currentAmmo, maxAmmo);
+        NotifyAmmoChange();
 
-        Vector2 dir = ((Vector2)mousePos - (Vector2)startPos).normalized;
-        float range = Mathf.Min(Vector2.Distance(startPos, mousePos), gunData._range);
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 dir = (mousePos - (Vector2)shootPoint.position).normalized;
+        float range = Mathf.Min(Vector2.Distance(shootPoint.position, mousePos), gunData._range);
 
-        RaycastHit2D hit = Physics2D.Raycast(startPos, dir, range, zombieMask);
+        RaycastHit2D hit = Physics2D.Raycast(shootPoint.position, dir, range, zombieMask);
 
         if (hit.collider && hit.distance <= range)
         {
             PhotonView targetPhotonView = hit.collider.GetComponent<PhotonView>();
 
-            if (targetPhotonView && playerPhotonView)
+            if (PhotonNetwork.IsConnected)
             {
-                // Llamo RPC de daño solo al MasterClient
-                playerPhotonView.RPC(nameof(PlayerGunSync.RPC_MakeDamage), RpcTarget.MasterClient, targetPhotonView.ViewID, gunData._damage);
+                if (playerPhotonView != null && targetPhotonView != null)
+                {
+                    playerPhotonView.RPC(nameof(PlayerGunSync.RPC_MakeDamage),
+                        RpcTarget.MasterClient, targetPhotonView.ViewID, gunData._damage);
+                }
+            }
+            else
+            {
+                if (hit.collider.TryGetComponent(out HealthScript enemyHealth))
+                {
+                    enemyHealth.TakeDamage(gunData._damage);
+                }
             }
         }
 
-        //------------------------------- Feedback Local ------------------------------- //
-        // Se hace local para evitar delay y se ve en la propia cámara
         PlayShootSound();
         ShowFlash();
 
-        //------------------------------- Feedback Red ------------------------------- //
-        // Solo se llama a RPC una vez por disparo para otros jugadores
-        if (playerPhotonView != null)
+        if (PhotonNetwork.IsConnected && playerPhotonView != null)
         {
             playerPhotonView.RPC(nameof(PlayerGunSync.RPC_PlayShootSound), RpcTarget.Others);
             playerPhotonView.RPC(nameof(PlayerGunSync.RPC_ShowMuzzleFlash), RpcTarget.Others);
@@ -122,43 +125,43 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
 
         currentAmmo += ammoToLoad;
         maxAmmo -= ammoToLoad;
-        OnAmmoChange?.Invoke(currentAmmo, maxAmmo);
 
+        NotifyAmmoChange();
         IsReloading = false;
     }
 
-    public virtual void GetAmmo()
-    {
-        maxAmmo += ammoClip;
-    }
+    public virtual void GetAmmo() => maxAmmo += ammoClip;
 
     public virtual void FullReload()
     {
         currentAmmo = gunData._clipAmmo;
         maxAmmo = gunData._maxAmmo;
+        NotifyAmmoChange();
+    }
+
+    public void ShowFlash()
+    {
+        if (flashCoroutine != null)
+            StopCoroutine(flashCoroutine);
+        flashCoroutine = StartCoroutine(MuzzleFlashRoutine());
     }
 
     IEnumerator MuzzleFlashRoutine()
     {
         if (muzzleFlash == null) yield break;
-
         muzzleFlash.enabled = true;
-        yield return new WaitForSeconds(0.1f);   // duracion del flash
+        yield return new WaitForSeconds(0.1f);
         muzzleFlash.enabled = false;
-    }
-
-    public void ShowFlash()
-    {
-        // Detengo corutina anterior si estaba corriendo
-        if (flashCoroutine != null)
-            StopCoroutine(flashCoroutine);
-
-        flashCoroutine = StartCoroutine(MuzzleFlashRoutine());
     }
 
     public void PlayShootSound()
     {
-        audioSource.PlayOneShot(gunData._shootSound);
+        audioSource?.PlayOneShot(gunData._shootSound);
+    }
+
+    protected void NotifyAmmoChange()
+    {
+        OnAmmoChange?.Invoke(currentAmmo, maxAmmo);
     }
     #endregion
 }
