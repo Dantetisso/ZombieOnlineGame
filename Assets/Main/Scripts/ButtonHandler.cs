@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class ButtonHandler : MonoBehaviour
-{
+{/*
   [SerializeField] private int id;
   private GunHolderScript gunHolder;
 
@@ -20,5 +20,5 @@ public class ButtonHandler : MonoBehaviour
     gunHolder.ChangeGun(id);
     gunHolder.LoadGun(id);
   }
-
+*/
 }

@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6ca7c299f9152948a7ba5768b145681, type: 3}
   m_Name: Sniper
   m_EditorClassIdentifier: 
+  <_gunType>k__BackingField: 2
   <_damage>k__BackingField: 5
   <_range>k__BackingField: 10
   <_IsAutomatic>k__BackingField: 0
   <_fireFate>k__BackingField: 1
   <_clipAmmo>k__BackingField: 5
   <_maxAmmo>k__BackingField: 20
+  <_shootSound>k__BackingField: {fileID: 0}

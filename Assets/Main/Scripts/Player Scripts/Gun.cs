@@ -1,41 +1,54 @@
+using System;
 using System.Collections;
 using Photon.Pun;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 
-public class Gun : MonoBehaviourPunCallbacks, IGun
+public enum GunEnum
+{
+    Pistol,
+    AutomaticRifle,
+    Rifle,
+    Shotgun
+}
+
+public abstract class Gun : MonoBehaviourPunCallbacks, IGun
 {
     #region Variables
-    [SerializeField] GunStats gunData;
-    [SerializeField] Transform shootPoint;
-    [SerializeField] private Text ammoCount;
-    [SerializeField] private Text maxAmmoCount;
-    [SerializeField] private LayerMask zombieMask;
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private SpriteRenderer muzzleFlash;
+    [Header("Estadisticas del arma")]
+    [SerializeField] protected GunStats gunData;
+    [SerializeField] protected Transform shootPoint;
+    [SerializeField] public Sprite gunImage;
+    [SerializeField] protected LayerMask zombieMask;
+    [SerializeField] protected AudioSource audioSource;
+    [SerializeField] protected SpriteRenderer muzzleFlash;
 
     private Vector2 mousePos;
     private Vector2 startPos;
-    private int currentAmmo;
-    private int maxAmmo;
-    private int ammoClip;
+    protected int currentAmmo;
+    protected int maxAmmo;
+    protected int ammoClip;
+    public int _currentAmmo => currentAmmo;
+    public int _maxAmmo => maxAmmo;
     private bool IsReloading;
     private float nextFireTime;
+   [HideInInspector] public GunEnum gunEnum;
 
+    public event Action<int, int> OnAmmoChange;
     private PhotonView playerPhotonView; // cacheo para no buscar cada disparo
     private Coroutine flashCoroutine;    // para controlar la corutina del flash
     #endregion
 
     #region Metodos de Unity
-    void Start()
+
+    protected virtual void Start()
     {
         // Inicializo munición
         ammoClip = gunData._clipAmmo;
         currentAmmo = ammoClip;
         maxAmmo = gunData._maxAmmo;
-        ammoCount.text = currentAmmo.ToString();
-        maxAmmoCount.text = maxAmmo.ToString();
+        gunEnum = gunData._gunType;
+
+        OnAmmoChange?.Invoke(currentAmmo, maxAmmo);
 
         // ------------------------ Apago el flash al inicio ------------------------ //
         if (muzzleFlash != null)
@@ -54,42 +67,19 @@ public class Gun : MonoBehaviourPunCallbacks, IGun
 
         HandleShooting();
         HandleReloading();
-
-        ammoCount.text = currentAmmo.ToString();
-        maxAmmoCount.text = maxAmmo.ToString();
     }
     #endregion
 
     #region Metodos
-    private void HandleShooting()
-    {
-        if (gunData._IsAutomatic)
-        {
-            if (Input.GetKey(KeyCode.Mouse0) && Time.time >= nextFireTime && currentAmmo > 0)
-            {
-                nextFireTime = Time.time + 1f / gunData._fireFate;
-                Shoot();
-            }
-        }
-        else
-        {
-            if (Input.GetKeyDown(KeyCode.Mouse0) && currentAmmo > 0)
-            {
-                Shoot();
-            }
-        }
-    }
-
-    private void HandleReloading()
-    {
-        if (maxAmmo > 0 && Input.GetKeyDown(KeyCode.R))
-            Reload();
-    }
+    public abstract void HandleShooting();
+    public abstract void HandleReloading();
 
     public void Shoot()
     {
         if (IsReloading) return;
+
         currentAmmo--;
+        OnAmmoChange?.Invoke(currentAmmo, maxAmmo);
 
         Vector2 dir = ((Vector2)mousePos - (Vector2)startPos).normalized;
         float range = Mathf.Min(Vector2.Distance(startPos, mousePos), gunData._range);
@@ -103,10 +93,7 @@ public class Gun : MonoBehaviourPunCallbacks, IGun
             if (targetPhotonView && playerPhotonView)
             {
                 // Llamo RPC de daño solo al MasterClient
-                playerPhotonView.RPC(nameof(PlayerGunSync.RPC_MakeDamage),
-                                     RpcTarget.MasterClient,
-                                     targetPhotonView.ViewID,
-                                     gunData._damage);
+                playerPhotonView.RPC(nameof(PlayerGunSync.RPC_MakeDamage), RpcTarget.MasterClient, targetPhotonView.ViewID, gunData._damage);
             }
         }
 
@@ -124,7 +111,7 @@ public class Gun : MonoBehaviourPunCallbacks, IGun
         }
     }
 
-    public void Reload()
+    public virtual void Reload()
     {
         if (IsReloading || maxAmmo <= 0 || currentAmmo == ammoClip)
             return;
@@ -136,19 +123,31 @@ public class Gun : MonoBehaviourPunCallbacks, IGun
 
         currentAmmo += ammoToLoad;
         maxAmmo -= ammoToLoad;
+        OnAmmoChange?.Invoke(currentAmmo, maxAmmo);
 
         IsReloading = false;
     }
 
-    public void GetAmmo()
+    public virtual void GetAmmo()
     {
         maxAmmo += ammoClip;
     }
 
-    public void FullReload()
+    public virtual void FullReload()
     {
         currentAmmo = gunData._clipAmmo;
         maxAmmo = gunData._maxAmmo;
+    }
+
+    protected void NotifyAmmoChange()
+    {
+        OnAmmoChange?.Invoke(currentAmmo, maxAmmo);
+    }
+
+    public virtual void ResetFireState()
+    {
+        nextFireTime = Time.time; // para que no se dispare instantáneamente
+                                  // si tu arma tiene flags de disparo, resetearlos aquí también
     }
 
     IEnumerator MuzzleFlashRoutine()

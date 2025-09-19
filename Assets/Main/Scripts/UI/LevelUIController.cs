@@ -1,7 +1,8 @@
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
-public class LevelUIController : MonoBehaviour
+public class LevelUIController : MonoBehaviour // maneja UI del nivel
 {
     [SerializeField] private TMP_Text waveText;
     [SerializeField] private TMP_Text zombieCountText;
@@ -54,4 +55,5 @@ public class LevelUIController : MonoBehaviour
     {
         playersAliveText.text = $"Players Alive: {count}";
     }
+
 }

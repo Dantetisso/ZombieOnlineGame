@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
+using System;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 {
@@ -27,14 +28,17 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [Header("Interaction")]
     [SerializeField] private LayerMask interactableLayer;
     [SerializeField] private Transform interactPoint;
-    [SerializeField] private GunHolderScript gunHolder;
     [SerializeField] private CameraWork cameraFollow;
+    [SerializeField] private Gun[] guns;
+    private Gun activeGun;
     private HealthScript health;
     private Camera mainCamera;
     
     [Header("UI")]
     [SerializeField] private GameObject localHUD;
     [SerializeField] private TMP_Text playerNameText;
+
+    public event Action<Gun> OnChangeGun;
     #endregion
 
     #region Metodos
@@ -72,6 +76,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 
             localHUD.SetActive(false);
         }
+
+        Gun gun = GetComponentInChildren<Gun>();  // obtengo el arma
+        PlayerUIController ui = GetComponentInChildren<PlayerUIController>(); // y el script de la UI
+        ui.InitGun(gun);   // y seteo
     }
     
     void Update()
@@ -161,14 +169,35 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     void ChangeGuns()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            gunHolder.ChangeGun(0);
-        }
+            ChangeGun(GunEnum.AutomaticRifle);
         if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            gunHolder.ChangeGun(1);
-        }
+            ChangeGun(GunEnum.Shotgun);
     }
+
+    public void ChangeGun(GunEnum type)
+    {
+        foreach (var gun in guns)
+        {
+            if (gun != null)
+            {
+                bool active = gun.gunEnum == type;
+                gun.gameObject.SetActive(active);
+
+                if (active)
+                {
+                    activeGun = gun;
+                    OnChangeGun?.Invoke(gun);
+                }
+            }
+        }
+        
+        // Actualizar UI
+        var ui = GetComponentInChildren<PlayerUIController>();
+        ui?.InitGun(activeGun);
+    }
+    
+    public Gun GetActiveGun() => activeGun;
+
 
     IEnumerator EndEvade()
     {
