@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &942493531155212126
+--- !u!1 &2444206532295476073
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,23 +8,21 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7466593210481441102}
-  - component: {fileID: 3993065745433120583}
-  - component: {fileID: 2464494861505705611}
-  m_Layer: 0
-  m_Name: hitbox
+  - component: {fileID: 822934851171770247}
+  m_Layer: 8
+  m_Name: AttackPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7466593210481441102
+--- !u!4 &822934851171770247
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 942493531155212126}
+  m_GameObject: {fileID: 2444206532295476073}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -33,38 +31,6 @@ Transform:
   m_Father: {fileID: 7618339568066716610}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3993065745433120583
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 942493531155212126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09752a45af4de174d97fac44341c9bc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stats: {fileID: 11400000, guid: 7d1bbd6f42f7d2d44a2e94569c8ee526, type: 2}
-  targetlayer:
-    serializedVersion: 2
-    m_Bits: 64
---- !u!58 &2464494861505705611
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 942493531155212126}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 1.5
 --- !u!1 &2643109736072550674
 GameObject:
   m_ObjectHideFlags: 0
@@ -83,10 +49,9 @@ GameObject:
   - component: {fileID: 2601603615304213789}
   - component: {fileID: 7828015227974735552}
   - component: {fileID: 1324849309873064815}
-  - component: {fileID: 2606976743667506008}
   - component: {fileID: 4367403749330729693}
+  - component: {fileID: 2606976743667506008}
   - component: {fileID: 7323424294212425149}
-  - component: {fileID: 8806686371319385635}
   m_Layer: 8
   m_Name: Zombie
   m_TagString: Untagged
@@ -107,7 +72,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4378783979568069498}
-  - {fileID: 7466593210481441102}
+  - {fileID: 822934851171770247}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -331,19 +296,6 @@ MonoBehaviour:
   maxHealth: 0
   currentHealth: 0
   IsPlayer: 0
---- !u!114 &2606976743667506008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2643109736072550674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36699fe7e05011744893d86952bd0725, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stats: {fileID: 11400000, guid: 7d1bbd6f42f7d2d44a2e94569c8ee526, type: 2}
 --- !u!114 &4367403749330729693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -361,6 +313,20 @@ MonoBehaviour:
   obsMask:
     serializedVersion: 2
     m_Bits: 8
+--- !u!114 &2606976743667506008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2643109736072550674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36699fe7e05011744893d86952bd0725, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyStats: {fileID: 11400000, guid: 7d1bbd6f42f7d2d44a2e94569c8ee526, type: 2}
+  attackPoint: {fileID: 822934851171770247}
 --- !u!114 &7323424294212425149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,18 +340,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 1650658337178217681}
---- !u!114 &8806686371319385635
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2643109736072550674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3212a1d4ea5403146813e633957c3089, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3382354808654727446
 GameObject:
   m_ObjectHideFlags: 0

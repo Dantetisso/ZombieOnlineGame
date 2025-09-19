@@ -104,8 +104,12 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
             }
         }
 
+        // -------------------- Feedback Local -------------------- //
+
         PlayShootSound();
         ShowFlash();
+
+        // -------------------- Feedback Red -------------------- //
 
         if (PhotonNetwork.IsConnected && playerPhotonView != null)
         {

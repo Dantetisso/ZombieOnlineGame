@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Config", menuName = ("Scriptable Objects/GameConfig"))]
+[CreateAssetMenu(fileName = "New Config", menuName = "Scriptable Objects/GameConfig")]
 public class GameConfig : ScriptableObject
 {
     [field: SerializeField] public int _maxWaves { get; private set; }

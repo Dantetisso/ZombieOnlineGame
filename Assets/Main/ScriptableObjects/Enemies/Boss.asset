@@ -10,15 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f8c59f8f025ecb4bb311de2cd0d1ccd, type: 3}
-  m_Name: Base Zombi
+  m_Name: Boss
   m_EditorClassIdentifier: 
-  <_health>k__BackingField: 25
-  <_damage>k__BackingField: 10
-  <_range>k__BackingField: 5
-  <_speed>k__BackingField: 5
+  <_health>k__BackingField: 50
+  <_damage>k__BackingField: 12
+  <_viewRange>k__BackingField: 6
+  <_speed>k__BackingField: 2
   <_attackLayer>k__BackingField:
     serializedVersion: 2
     m_Bits: 64
-  <_attackDistance>k__BackingField: 4.5
+  <_attackDistance>k__BackingField: 4
   <_attackDuration>k__BackingField: 1
   <_minAttackRange>k__BackingField: 2.5
+  <_attackSpeed>k__BackingField: 0.9
