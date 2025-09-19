@@ -6,35 +6,18 @@ public class LineOfSightMono : MonoBehaviour
 {
     public float range;
     public float angle;
-    public LayerMask obsMask;
+    public LayerMask obsMask; // Usar la layer del jugador
 
     public bool CheckRange(Transform target)
     {
-        return CheckRange(target, range);
-    }
-
-    public bool CheckRange(Transform target, float range)
-    {
-        //A->B
-        //B-A
-        //A: Self
-        //B: Target
-        //return Vector3.Distance(self.position, target.position) <= range;
-
         Vector2 dir = target.position - transform.position;
-        float distance = dir.magnitude;
-        return distance <= range;
+        return dir.magnitude <= range;
     }
 
     public bool CheckAngle(Transform target)
     {
-        return CheckAngle(target, transform.up);
-    }
-
-    public bool CheckAngle(Transform target, Vector2 front)
-    {
         Vector2 dir = target.position - transform.position;
-        float angleToTarget = Vector2.Angle(front, dir);
+        float angleToTarget = Vector2.Angle(transform.up, dir);
         return angleToTarget <= angle / 2;
     }
 
@@ -48,7 +31,7 @@ public class LineOfSightMono : MonoBehaviour
     {
         return CheckRange(target) && CheckAngle(target) && CheckView(target);
     }
-    
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.blue;

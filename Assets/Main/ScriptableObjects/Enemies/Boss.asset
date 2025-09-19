@@ -19,7 +19,5 @@ MonoBehaviour:
   <_attackLayer>k__BackingField:
     serializedVersion: 2
     m_Bits: 64
-  <_attackDistance>k__BackingField: 4
-  <_attackDuration>k__BackingField: 1
-  <_minAttackRange>k__BackingField: 2.5
-  <_attackSpeed>k__BackingField: 0.9
+  <_attackRange>k__BackingField: 3
+  <_attackSpeed>k__BackingField: 0.7

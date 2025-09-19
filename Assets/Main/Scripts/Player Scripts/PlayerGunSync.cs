@@ -41,7 +41,7 @@ public class PlayerGunSync : MonoBehaviourPun // este script es para que se pued
 
         if (targetPhotonView != null && targetPhotonView.TryGetComponent(out IDamageable damageable))
         {
-            damageable.GetDamage(damage);
+            damageable.TakeDamage(damage);
         }
     }
 }

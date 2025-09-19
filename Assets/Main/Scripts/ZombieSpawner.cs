@@ -4,56 +4,67 @@ using UnityEngine;
 
 public class ZombieSpawner : MonoBehaviourPun
 {
-    [Header("Spawner Settings")]
-    [SerializeField] private GameConfig config;
-
     [Header("Spawn Points")]
-    [Tooltip("Spawn points para zombies normales")]
     [SerializeField] private Transform[] normalSpawnPoints;
+    [SerializeField] private Transform[] bossSpawnPoints;
 
-    [Tooltip("Spawn point único para el boss")]
-    [SerializeField] private Transform bossSpawnPoint;
-
-    [Header("Prefabs")]
-    [SerializeField] private GameObject normalZombiePrefab;
-    [SerializeField] private GameObject bossZombiePrefab;
-
-    [Header("Game Manager")]
+    [Header("References")]
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private GameObject zombiePrefab;
+    [SerializeField] private GameObject bossPrefab;
 
     private readonly Dictionary<int, bool> isBossByID = new();
 
-    private void OnEnable() => GameManager.OnWaveStarted += SpawnWave;
-    private void OnDisable() => GameManager.OnWaveStarted -= SpawnWave;
+    private void OnEnable()
+    {
+        GameManager.OnWaveStarted += SpawnWave;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnWaveStarted -= SpawnWave;
+    }
 
     private void SpawnWave(int wave, int amount, bool bossWave)
     {
         if (!PhotonNetwork.IsMasterClient) return;
 
-        for (int i = 0; i < amount; i++)
+        if (!bossWave)
         {
-            bool spawnBoss = bossWave && i == 0;
-            GameObject prefab = spawnBoss ? bossZombiePrefab : normalZombiePrefab;
-
-            // Spawn point
-            Transform spawnPoint = spawnBoss ? bossSpawnPoint : normalSpawnPoints[i % normalSpawnPoints.Length];
-
-            GameObject go = PhotonNetwork.Instantiate(prefab.name, spawnPoint.position, Quaternion.identity);
-
-            if (go.TryGetComponent(out PhotonView pv))
-                isBossByID[pv.ViewID] = spawnBoss;
-
-            if (go.TryGetComponent(out ZombieController controller))
+            for (int i = 0; i < amount; i++)
             {
-                // waypoints de hijos del spawn point
-                Transform[] waypoints = new Transform[spawnPoint.childCount];
-                for (int w = 0; w < spawnPoint.childCount; w++)
-                    waypoints[w] = spawnPoint.GetChild(w);
+                Transform spawnPoint = normalSpawnPoints[i % normalSpawnPoints.Length];
+                GameObject go = PhotonNetwork.Instantiate(zombiePrefab.name, spawnPoint.position, Quaternion.identity);
+                if (go.TryGetComponent(out ZombieController zombieCtrl))
+                {
+                    // Asignar waypoints hijos
+                    Transform[] waypoints = new Transform[spawnPoint.childCount];
+                    for (int j = 0; j < spawnPoint.childCount; j++)
+                        waypoints[j] = spawnPoint.GetChild(j);
 
-                controller.SetWaypoints(waypoints);
+                    zombieCtrl.SetPatrolWaypoints(waypoints);
+                    zombieCtrl.EnablePatrol();
 
-                if (spawnBoss)
-                    controller.DisablePatrol();
+                    isBossByID[go.GetComponent<PhotonView>().ViewID] = false;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                Transform spawnPoint = bossSpawnPoints[i % bossSpawnPoints.Length];
+                GameObject go = PhotonNetwork.Instantiate(bossPrefab.name, spawnPoint.position, Quaternion.identity);
+                if (go.TryGetComponent(out ZombieController bossCtrl))
+                {
+                    Transform[] waypoints = new Transform[spawnPoint.childCount];
+                    for (int j = 0; j < spawnPoint.childCount; j++)
+                        waypoints[j] = spawnPoint.GetChild(j);
+
+                    bossCtrl.SetPatrolWaypoints(waypoints);
+                    if (waypoints.Length > 0) bossCtrl.EnablePatrol(); // patrulla solo si tiene hijos
+                    isBossByID[go.GetComponent<PhotonView>().ViewID] = true;
+                }
             }
         }
     }

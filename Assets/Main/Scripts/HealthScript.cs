@@ -1,11 +1,11 @@
 using System;
 using System.Collections;
-using Photon.Pun;
 using Photon.Realtime;
+using Photon.Pun;
 using UnityEngine;
 
 [RequireComponent(typeof(PhotonView))]
-public class HealthScript : MonoBehaviourPun
+public class HealthScript : MonoBehaviourPun, IDamageable
 {
     [Header("Health")]
     public int maxHealth;
@@ -23,7 +23,6 @@ public class HealthScript : MonoBehaviourPun
     void Start()
     {
         currentHealth = maxHealth;
-
         _renderer = GetComponentInChildren<Renderer>();
         if (_renderer != null)
         {
@@ -109,5 +108,10 @@ public class HealthScript : MonoBehaviourPun
             FindObjectOfType<ZombieSpawner>().OnZombieDied(viewID);
             PhotonNetwork.Destroy(gameObject);
         }
+    }
+
+    public void GetDamage(int damage)
+    {
+        TakeDamage(damage);
     }
 }

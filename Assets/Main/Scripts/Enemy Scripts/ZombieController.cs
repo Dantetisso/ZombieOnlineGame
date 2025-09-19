@@ -6,17 +6,15 @@ using Photon.Pun;
 public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
 {
     [Header("References")]
-    private NavMeshAgent navAgent;
-    private HealthScript health;
-    private LineOfSightMono lineOfSight;
+    public NavMeshAgent navAgent; // público para acceso desde spawner
+    public HealthScript health;
+    public LineOfSightMono lineOfSight;
+    public EnemyStats enemyStats; // público para acceso desde spawner
 
-    [SerializeField] private EnemyStats enemyStats;
-    [SerializeField] private Transform attackPoint; // Punto central para el overlap de ataque
-
-    [Header("Patrol")]
+    [Header("Patrol Settings")]
     private Transform[] patrolWaypoints;
     private int currentWaypointIndex = 0;
-    private bool canPatrol = true;
+    private bool canPatrol = false;
 
     [Header("AI State")]
     private EnemyStates currentState;
@@ -48,6 +46,10 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
             navAgent.SetDestination(patrolWaypoints[currentWaypointIndex].position);
             currentState = EnemyStates.Patrol;
         }
+        else
+        {
+            currentState = EnemyStates.Idle;
+        }
     }
 
     private void Update()
@@ -65,8 +67,8 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     #region Patrol
     private void PatrolBehavior()
     {
-        Transform detectedPlayer = DetectPlayerInLOS();
-        if (detectedPlayer != null)
+        Transform targetPlayer = DetectPlayerInLOS();
+        if (targetPlayer != null)
         {
             currentState = EnemyStates.Chase;
             return;
@@ -85,20 +87,20 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     #region Chase
     private void ChaseBehavior()
     {
-        Transform detectedPlayer = DetectPlayerInLOS();
-        if (detectedPlayer == null)
+        Transform targetPlayer = DetectPlayerInLOS();
+        if (targetPlayer == null)
         {
             currentState = canPatrol ? EnemyStates.Patrol : EnemyStates.Idle;
             navAgent.isStopped = false;
             return;
         }
 
-        float distanceToPlayer = Vector3.Distance(transform.position, detectedPlayer.position);
+        float distanceToPlayer = Vector3.Distance(transform.position, targetPlayer.position);
 
-        if (distanceToPlayer > enemyStats._attackDistance)
+        if (distanceToPlayer > enemyStats._attackRange)
         {
             navAgent.isStopped = false;
-            navAgent.SetDestination(detectedPlayer.position);
+            navAgent.SetDestination(targetPlayer.position);
         }
         else
         {
@@ -112,8 +114,8 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     private void AttackBehavior()
     {
         Collider2D[] playersInRange = Physics2D.OverlapCircleAll(
-            attackPoint.position,
-            enemyStats._attackDistance,
+            transform.position,
+            enemyStats._attackRange,
             enemyStats._attackLayer
         );
 
@@ -139,7 +141,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         }
 
         // Ataque con cooldown
-        if (Time.time - lastAttackTime >= enemyStats._attackDuration)
+        if (Time.time - lastAttackTime >= enemyStats._attackSpeed)
         {
             lastAttackTime = Time.time;
             DealDamageToTarget(targetPlayer);
@@ -159,37 +161,48 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
 
     private void DealDamageToTarget(Transform target)
     {
-        PhotonView targetView = target.GetComponent<PhotonView>();
+        PhotonView targetPhotonView = target.GetComponent<PhotonView>();
         PhotonView myView = transform.root.GetComponent<PhotonView>();
 
         if (PhotonNetwork.IsConnected)
         {
-            if (targetView && myView)
-                myView.RPC(nameof(RPC_DealDamage), RpcTarget.All, targetView.ViewID, enemyStats._damage);
+            if (targetPhotonView && myView)
+                myView.RPC(nameof(RPC_DealDamage), RpcTarget.All, targetPhotonView.ViewID, enemyStats._damage);
         }
         else
         {
             if (target.TryGetComponent(out IDamageable dmg))
-                dmg.GetDamage(enemyStats._damage);
+                dmg.TakeDamage(enemyStats._damage);
         }
     }
 
-    public void SetWaypoints(Transform[] waypoints)
+    public void SetPatrolWaypoints(Transform[] waypoints)
     {
         patrolWaypoints = waypoints;
         currentWaypointIndex = 0;
 
-        if (canPatrol && patrolWaypoints.Length > 0)
+        if (patrolWaypoints.Length > 0)
         {
+            canPatrol = true;
             navAgent.SetDestination(patrolWaypoints[currentWaypointIndex].position);
             currentState = EnemyStates.Patrol;
         }
+        else
+        {
+            canPatrol = false;
+            currentState = EnemyStates.Idle;
+        }
     }
 
-    public void DisablePatrol()
+    public void EnablePatrol()
     {
-        canPatrol = false;
-        currentState = EnemyStates.Idle;
+        canPatrol = true;
+        if (patrolWaypoints.Length > 0)
+        {
+            currentWaypointIndex = 0;
+            navAgent.SetDestination(patrolWaypoints[currentWaypointIndex].position);
+            currentState = EnemyStates.Patrol;
+        }
     }
 
     [PunRPC]
@@ -198,21 +211,18 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         PhotonView targetPhotonView = PhotonView.Find(targetViewID);
         if (targetPhotonView != null && targetPhotonView.TryGetComponent(out IDamageable damageable))
         {
-            damageable.GetDamage(damage);
+            damageable.TakeDamage(damage);
         }
     }
 
-    public void GetDamage(int damage)
+    public void TakeDamage(int damage)
     {
         health.TakeDamage(damage);
     }
 
     private void OnDrawGizmosSelected()
     {
-        if (attackPoint != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(attackPoint.position, enemyStats._attackDistance);
-        }
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, enemyStats._attackRange);
     }
 }

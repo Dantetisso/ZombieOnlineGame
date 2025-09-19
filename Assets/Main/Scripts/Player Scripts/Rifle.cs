@@ -8,7 +8,7 @@ public class Rifle : Gun
         {
             nextFireTime = Time.time + 1f / gunData._fireFate;
             Shoot();
-            Debug.Log("<color=yellow>" + name + "</color> Tirando");
+//            Debug.Log("<color=yellow>" + name + "</color> Tirando");
         }
     }
 
@@ -17,7 +17,7 @@ public class Rifle : Gun
         if (_maxAmmo > 0 && Input.GetKeyDown(KeyCode.R))
         {
             Reload();
-            Debug.Log("<color=yellow>" + name + "</color> Recargando");
+  //         Debug.Log("<color=yellow>" + name + "</color> Recargando");
         }
     }
 }

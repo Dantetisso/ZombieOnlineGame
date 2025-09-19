@@ -7,7 +7,7 @@ public class Shotgun : Gun
         if (Input.GetKeyDown(KeyCode.Mouse0) && _currentAmmo > 0)
         {
             Shoot();
-            Debug.Log("<color=green>" + name + "</color> Tirando");
+        //    Debug.Log("<color=green>" + name + "</color> Tirando");
         }
     }
 
@@ -16,7 +16,7 @@ public class Shotgun : Gun
         if (_maxAmmo > 0 && Input.GetKeyDown(KeyCode.R))
         {
             Reload();
-            Debug.Log("<color=green>" + name + "</color> Recargando");
+      //      Debug.Log("<color=green>" + name + "</color> Recargando");
         }
     }
 }
