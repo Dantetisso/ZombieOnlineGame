@@ -1,11 +1,8 @@
-using Photon.Pun;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
-using Photon.Realtime;
-using System.Collections.Generic;
-
+using Photon.Pun;
 public class MainMenuStarter : MonoBehaviourPunCallbacks
 {
     public static bool hasRequestedJoinRoom = false;
@@ -19,6 +16,10 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject joinPanel;       // panel de rooms
     [SerializeField] private GameObject createRoomPanel; // panel para crear room
     [SerializeField] private Button createRoomButton;
+
+    [Header("Warning Nickname Text")]
+    [SerializeField] private GameObject warningNicknameText;
+    [SerializeField] private float warningTime;
 
     [Header("Create Room UI")]
     [SerializeField] private TMP_InputField roomNameInput;
@@ -57,7 +58,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
         if (string.IsNullOrEmpty(playerName))
         {
-            Debug.LogWarning("Sin nickname no entras.");
+            StartCoroutine(warningText());
             return;
         }
 
@@ -65,12 +66,12 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
         if (!PhotonNetwork.IsConnected)
         {
-            // Guardamos una referencia local de este objeto
+            // Guardo referencia local de este objeto
             var self = this;
 
             ConnectionManager.Instance.ConnectToServer(() =>
             {
-                // Chequeamos si el objeto sigue existiendo
+                // y chequeo si el objeto sigue existiendo
                 if (self == null || self.gameObject == null) return;
 
                 Debug.Log("Conectado al servidor. Mostrando rooms...");
@@ -104,7 +105,6 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
             roomName = PhotonNetwork.NickName + "'s Room"; // si no pones un nombre te pone este por defecto
         }
 
-        // Creo la sala con max 4 jugadores
         ConnectionManager.Instance.CreateRoom(roomName);
         hasRequestedJoinRoom = true;
         createRoomPanel.SetActive(false);
@@ -115,8 +115,15 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         if (hasRequestedJoinRoom)
         {
             hasRequestedJoinRoom = false;
-            SceneLoader.LoadScene(ScenesEnum.Lobby); // el jugador entra a la escena del lobby
+            SceneLoader.LoadScene(ScenesEnum.Lobby); 
         }
+    }
+
+    IEnumerator warningText()
+    {
+        warningNicknameText.SetActive(true);
+        yield return new WaitForSeconds(warningTime);
+        warningNicknameText.SetActive(false);
     }
 
     void OnDestroy()
