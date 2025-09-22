@@ -667,7 +667,6 @@ GameObject:
   - component: {fileID: 260583197}
   - component: {fileID: 260583194}
   - component: {fileID: 260583196}
-  - component: {fileID: 260583195}
   m_Layer: 5
   m_Name: PistolButton
   m_TagString: Untagged
@@ -705,18 +704,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &260583195
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 260583193}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 269b35d62127b4b459a574bf88d896a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &260583196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -760,19 +747,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 260583194}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 260583195}
-        m_TargetAssemblyTypeName: ButtonHandler, Assembly-CSharp
-        m_MethodName: OnButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
+      m_Calls: []
 --- !u!222 &260583197
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3526,7 +3501,6 @@ GameObject:
   - component: {fileID: 1159051705}
   - component: {fileID: 1159051704}
   - component: {fileID: 1159051703}
-  - component: {fileID: 1159051702}
   m_Layer: 5
   m_Name: SniperButton
   m_TagString: Untagged
@@ -3555,18 +3529,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -300}
   m_SizeDelta: {x: 250, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1159051702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1159051700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 269b35d62127b4b459a574bf88d896a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1159051703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3610,19 +3572,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 260583194}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1159051702}
-        m_TargetAssemblyTypeName: ButtonHandler, Assembly-CSharp
-        m_MethodName: OnButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
+      m_Calls: []
 --- !u!114 &1159051704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4007,7 +3957,6 @@ GameObject:
   - component: {fileID: 1293604351}
   - component: {fileID: 1293604350}
   - component: {fileID: 1293604349}
-  - component: {fileID: 1293604348}
   m_Layer: 5
   m_Name: RifleButton
   m_TagString: Untagged
@@ -4036,18 +3985,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 100}
   m_SizeDelta: {x: 250, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1293604348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1293604346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 269b35d62127b4b459a574bf88d896a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1293604349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4091,19 +4028,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 260583194}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1293604348}
-        m_TargetAssemblyTypeName: ButtonHandler, Assembly-CSharp
-        m_MethodName: OnButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
+      m_Calls: []
 --- !u!114 &1293604350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5707,7 +5632,6 @@ GameObject:
   - component: {fileID: 1796476612}
   - component: {fileID: 1796476611}
   - component: {fileID: 1796476610}
-  - component: {fileID: 1796476609}
   m_Layer: 5
   m_Name: ShotgunButton
   m_TagString: Untagged
@@ -5736,18 +5660,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -100}
   m_SizeDelta: {x: 250, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1796476609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1796476607}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 269b35d62127b4b459a574bf88d896a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1796476610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5791,19 +5703,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 260583194}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1796476609}
-        m_TargetAssemblyTypeName: ButtonHandler, Assembly-CSharp
-        m_MethodName: OnButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
+      m_Calls: []
 --- !u!114 &1796476611
 MonoBehaviour:
   m_ObjectHideFlags: 0
