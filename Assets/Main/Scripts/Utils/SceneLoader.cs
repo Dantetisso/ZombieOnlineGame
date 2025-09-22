@@ -22,11 +22,6 @@ public static class SceneLoader
         SceneManager.LoadScene(scene.ToString());
     }
 
-    public static AsyncOperation LoadSceneAsync(ScenesEnum scene)
-    {
-        return SceneManager.LoadSceneAsync(scene.ToString());
-    }
-
     public static void LoadSceneByPhoton(ScenesEnum scene)
     {
         PhotonNetwork.LoadLevel(scene.ToString());

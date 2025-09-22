@@ -16,7 +16,7 @@ public class MainMenuScript : MonoBehaviourPunCallbacks
     void Start()
     {
         playButton.onClick.AddListener(Play);
-        soloButton.onClick.AddListener(PlaySolo);
+        soloButton.onClick.AddListener(playo);
         quitButton.onClick.AddListener(quit);
     }
 
@@ -29,6 +29,12 @@ public class MainMenuScript : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.OfflineMode = true; // modo offline
         PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 1 });
+        SceneLoader.LoadSceneByPhoton(ScenesEnum.Level);
+    }
+
+    void playo()
+    {
+        PhotonNetwork.JoinOrCreateRoom("TestRoom", new RoomOptions() { MaxPlayers = 1 }, default);
         SceneLoader.LoadSceneByPhoton(ScenesEnum.Level);
     }
 

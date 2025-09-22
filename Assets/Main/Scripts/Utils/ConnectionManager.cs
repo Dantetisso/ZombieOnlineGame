@@ -86,7 +86,7 @@ public class ConnectionManager : MonoBehaviourPunCallbacks // conecta entre el j
         MessageDisplay.Instance?.AddMessage($"{player.NickName} left the room.");
     }
 
-    public void CreateRoom(string roomName)
+    public void CreateRoom(string roomName) //el room options esta en el script photonconectionmanager
     {
         photonManager.CreateRoom(roomName);
     }

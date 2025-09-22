@@ -54,13 +54,6 @@ public class PhotonConnectionManager : MonoBehaviourPunCallbacks
         PhotonNetwork.CreateRoom(roomName, roomOptions);
     }
     
-    /*
-        public void JoinRoomByName(string roomName)
-        {
-            PhotonNetwork.JoinRoom(roomName);
-        }
-    */
-
     public void JoinRoom(string roomName)
     {
         PhotonNetwork.JoinRoom(roomName);

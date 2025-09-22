@@ -56,7 +56,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
     {
         string playerName = playerNameInput.text.Trim();
 
-        if (string.IsNullOrEmpty(playerName))
+        if (string.IsNullOrEmpty(playerName))   // si no pusiste tu nombre te sale el texto de advertencia
         {
             StartCoroutine(warningText());
             return;
@@ -69,7 +69,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
             // Guardo referencia local de este objeto
             var self = this;
 
-            ConnectionManager.Instance.ConnectToServer(() =>
+            ConnectionManager.Instance.ConnectToServer(() =>        // se conecta al server
             {
                 // y chequeo si el objeto sigue existiendo
                 if (self == null || self.gameObject == null) return;
@@ -102,7 +102,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
         if (string.IsNullOrEmpty(roomName))
         {
-            roomName = PhotonNetwork.NickName + "'s Room"; // si no pones un nombre te pone este por defecto
+            roomName = PhotonNetwork.NickName + "'s Room"; // si no le pones un nombre a la room, pone este por defecto
         }
 
         ConnectionManager.Instance.CreateRoom(roomName);

@@ -44,8 +44,7 @@ public class Lobby : MonoBehaviourPunCallbacks
 
     private void UpdateTexts()
     {
-        for (int i = 0; i < playerNickNameTexts.Length; i++)
-            playerNickNameTexts[i].text = "";
+        for (int i = 0; i < playerNickNameTexts.Length; i++) playerNickNameTexts[i].text = "";
 
         Dictionary<int, Player> players = ConnectionManager.Instance?.GetPlayersInRoom() ?? new Dictionary<int, Player>();
         List<Player> orderedPlayers = new List<Player>(players.Values);
@@ -61,15 +60,13 @@ public class Lobby : MonoBehaviourPunCallbacks
             }
         }
 
-        startGameButton.interactable = orderedPlayers.Count >= 2 && orderedPlayers.Count <= 4;
-
+       // startGameButton.interactable = orderedPlayers.Count >= 2 && orderedPlayers.Count <= 4;        // el boton se prende si esta la cantidad de jugadores
         Debug.Log($"[Lobby] Jugadores en la sala: {orderedPlayers.Count}");
     }
 
     void EmptyTexts()
     {
-        for (int i = 0; i < playerNickNameTexts.Length; i++)
-            playerNickNameTexts[i].text = "";
+        for (int i = 0; i < playerNickNameTexts.Length; i++) playerNickNameTexts[i].text = "";
     }
 
     void OnDestroy()

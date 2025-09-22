@@ -15,7 +15,9 @@ public class RoomListUI : MonoBehaviour
     }
 
     [Header("Slots de salas")]
-    [SerializeField] public RoomSlot[] slots; 
+    [SerializeField] public RoomSlot[] slots;
+
+    public bool canplayAlone = false;
 
     private void OnEnable()
     {
@@ -69,4 +71,11 @@ public class RoomListUI : MonoBehaviour
             }
         }
     }
+
+[ContextMenu("Can Play Alone")]
+    public void CanPlayAlone()
+    {
+        canplayAlone = true;
+    }
+    
 }

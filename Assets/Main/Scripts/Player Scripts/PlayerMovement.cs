@@ -191,13 +191,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 
     private void ChangeGunWithSync(GunEnum type)
     {
-        
         photonView.RPC(nameof(RPC_ChangeGun), RpcTarget.AllBuffered, type);
-        
-      /*  else
-        {
-            ChangeGun(type);
-        }*/
     }
 
     void ChangeGun(GunEnum type)
@@ -220,7 +214,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             activeGun = newGun;
             OnChangeGun?.Invoke(activeGun);
 
-            // Solo actualizamos UI local
+            // Solo actualiza UI local
             if (photonView.IsMine || !PhotonNetwork.IsConnected)
             {
                 var ui = GetComponentInChildren<PlayerUIController>();
