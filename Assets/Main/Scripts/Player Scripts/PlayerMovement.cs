@@ -6,10 +6,10 @@ using System;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 {
-    #region  Variables
+#region  Variables
     [Header("Movement")]
     [Range(0, 10)]
-    [SerializeField] private float movSpeed = 6f;
+    [SerializeField] private float movSpeed;
     private float horizontal;
     private float vertical;
     private Vector2 dir;
@@ -18,10 +18,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [Range(5, 20)]
     [SerializeField] private float evadeForce;
     private bool isEvading = false;
-    [SerializeField] private int maxEvades = 2;  // Máximo de cargas de esquive
+    [SerializeField] private int maxEvades;  // Máximo de cargas de esquive
     private int currentEvades;  // Cargas disponibles
-    private float evadeDuration = 0.2f;
-    [SerializeField] private float evadeCooldown = 2f; // Tiempo de cooldown por carga de esquive
+    private float evadeDuration;
+    [SerializeField] private float evadeCooldown; // Tiempo de cooldown por carga de esquive
 
     private Rigidbody2D rb;
 
@@ -39,13 +39,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [SerializeField] private TMP_Text playerNameText;
 
     public event Action<Gun> OnChangeGun;
-    #endregion
+#endregion
 
-    #region Metodos
+#region Metodos
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         health = GetComponent<HealthScript>();
+
         currentEvades = maxEvades;
         mainCamera = Camera.main;
 
@@ -54,12 +55,42 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             SetupLocalPlayer();
             
             var gun = GetComponentInChildren<Gun>();
-            activeGun = gun;           // importante asignarlo primero
+            activeGun = gun;          // asigna el arma activa
             OnChangeGun?.Invoke(activeGun); // dispara evento a UI
         }
         else
         {
             SetupRemotePlayer();
+        }
+    }
+    
+    void Update()
+    {
+        if (photonView.IsMine)
+        {
+            horizontal = Input.GetAxisRaw("Horizontal");
+            vertical = Input.GetAxisRaw("Vertical");
+
+            dir = new Vector2(horizontal, vertical);
+
+            Look();
+            ChangeGuns();
+            HandleEvade();
+            HandleInteract();
+            HandleLeave();
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (photonView.IsMine)
+        {
+            if (isEvading)
+            {
+                return;
+            }
+
+            Move();
         }
     }
 
@@ -75,7 +106,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         }
         else
         {
-            Debug.LogError("No esta el script CameraWork en la main camera.");
+            Debug.LogError("falta el script CameraWork en Main Camera.");
         }
 
         photonView.RPC("RPC_SetPlayerName", RpcTarget.AllBuffered, PhotonNetwork.NickName);
@@ -95,55 +126,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 
         localHUD.SetActive(false);
 
-    }
-    
-    void Update()
-    {
-        if (photonView.IsMine)
-        {
-            horizontal = Input.GetAxisRaw("Horizontal");
-            vertical = Input.GetAxisRaw("Vertical");
-
-            dir = new Vector2(horizontal, vertical);
-
-            Look();
-
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1) && currentEvades > 0 && !isEvading)
-            {
-                Evade();
-            }
-
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                ONInteract();
-            }
-
-            ChangeGuns();
-
-            if (Input.GetKeyDown(KeyCode.Escape)) // salir del juego
-            {
-                Application.Quit();
-            }
-            
-            if (Input.GetKeyDown(KeyCode.P)) // salir de la room
-            {
-                Debug.Log("Sali de la room");
-                RoomLeaver.Instance.LeaveRoom();
-            }
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (photonView.IsMine)
-        {
-            if (isEvading)
-            {
-                return;
-            }
-
-            Move();
-        }
     }
 
     void Look()
@@ -178,16 +160,50 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             StartCoroutine(EndEvade());
             StartCoroutine(ReloadEvade());
         }
+    }
 
+    void HandleInteract()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            ONInteract();
+        }
+    }
+    
+    void HandleEvade()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1) && currentEvades > 0 && !isEvading)
+        {
+            Evade();
+        }
+    }
+
+    void HandleLeave()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape)) // salir del juego
+        {
+            Application.Quit();
+        }
+            
+        if (Input.GetKeyDown(KeyCode.P)) // salir de la room
+        {
+            Debug.Log("Sali de la room");
+            RoomLeaver.Instance.LeaveRoom();
+        }
     }
 
     void ChangeGuns()
-{
-    if (Input.GetKeyDown(KeyCode.Alpha1))
-        ChangeGunWithSync(GunEnum.AutomaticRifle);
-    if (Input.GetKeyDown(KeyCode.Alpha2))
-        ChangeGunWithSync(GunEnum.Shotgun);
-}
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            ChangeGunWithSync(GunEnum.AutomaticRifle);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            ChangeGunWithSync(GunEnum.Shotgun);
+        }
+    }
 
     private void ChangeGunWithSync(GunEnum type)
     {
@@ -221,12 +237,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
                 ui?.InitGun(activeGun);
             }
         }
-    }
-
-    [PunRPC]
-    void RPC_ChangeGun(GunEnum type)
-    {
-        ChangeGun(type);
     }
 
     IEnumerator EndEvade()
@@ -263,16 +273,24 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             }
         }
     }
+
+    public void GetDamage(int damage)
+    {
+        health.TakeDamage(damage);
+    }
+#endregion
+
+#region RPCs
+    [PunRPC]
+    void RPC_ChangeGun(GunEnum type)
+    {
+        ChangeGun(type);
+    }
    
     [PunRPC]
     public void RPC_SetPlayerName(string playerName)
     {
         playerNameText.text = playerName;
     }
-
-    public void GetDamage(int damage)
-    {
-        health.TakeDamage(damage);
-    }
-    #endregion
+#endregion
 }
