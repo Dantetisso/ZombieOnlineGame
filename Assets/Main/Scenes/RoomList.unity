@@ -505,6 +505,7 @@ MonoBehaviour:
   - roomNameText: {fileID: 708519893}
     playerCountText: {fileID: 1444706226}
     joinButton: {fileID: 2094529514}
+  canplayAlone: 0
 --- !u!1 &146953727
 GameObject:
   m_ObjectHideFlags: 0
@@ -4938,7 +4939,7 @@ GameObject:
   - component: {fileID: 1971148190}
   - component: {fileID: 1971148194}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: RoomListCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

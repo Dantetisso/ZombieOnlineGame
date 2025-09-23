@@ -592,7 +592,7 @@ GameObject:
   - component: {fileID: 1067302050}
   - component: {fileID: 1067302053}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: MainMenuCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -710,7 +710,7 @@ GameObject:
   - component: {fileID: 1088284256}
   - component: {fileID: 1088284255}
   m_Layer: 0
-  m_Name: room leaver
+  m_Name: RoomLeaver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

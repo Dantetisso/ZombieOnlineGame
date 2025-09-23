@@ -185,9 +185,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             Application.Quit();
         }
             
-        if (Input.GetKeyDown(KeyCode.P)) // salir de la room
+        if (Input.GetKeyDown(KeyCode.P)) // sale de la room y carga el mainmenu
         {
-            Debug.Log("Sali de la room");
             RoomLeaver.Instance.LeaveRoom();
         }
     }
@@ -255,7 +254,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         }
     }
 
-    public float GetevadeTime()
+    public float GetEvadeTime()
     {
         return (float)currentEvades / maxEvades;
     }

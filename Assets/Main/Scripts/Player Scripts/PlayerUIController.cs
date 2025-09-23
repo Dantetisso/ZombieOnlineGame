@@ -87,7 +87,7 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
 
     void UpdateEvadeBar()
     {
-        evadeBar.fillAmount = player.GetevadeTime();
+        evadeBar.fillAmount = player.GetEvadeTime();
     }
 
     private void UpdateAmmoText(int clip, int reserve)

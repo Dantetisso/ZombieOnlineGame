@@ -36,7 +36,7 @@ public class LevelUIController : MonoBehaviour // maneja UI del nivel
 
     private void HandleWaveStarted(int wave, int amount, bool bossWave)
     {
-        waveText.text = $"Round: {wave}";
+        waveText.text = "Round: " + wave;
         zombieCountText.text = "Zombies: " + amount;
     }
 
@@ -53,7 +53,7 @@ public class LevelUIController : MonoBehaviour // maneja UI del nivel
 
     private void UpdateAlivePlayers(int count)
     {
-        playersAliveText.text = $"Players Alive: {count}";
+        playersAliveText.text = "Players Alive: " + count;
     }
 
 }

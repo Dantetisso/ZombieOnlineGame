@@ -18,6 +18,6 @@ public class EvadeBar : MonoBehaviour
 
     void UpdateBar()
     {
-        bar.fillAmount = player.GetevadeTime();
+        bar.fillAmount = player.GetEvadeTime();
     }
 }
