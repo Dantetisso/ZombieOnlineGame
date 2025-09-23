@@ -16,7 +16,7 @@ public class Lobby : MonoBehaviourPunCallbacks
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         EmptyTexts();
 
-        if (!photonView.IsMine) startGameButton.gameObject.SetActive(false);
+    //    if (!photonView.IsMine) startGameButton.gameObject.SetActive(false);
 
         if (ConnectionManager.Instance != null)
         {

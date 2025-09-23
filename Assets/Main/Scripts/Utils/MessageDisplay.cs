@@ -25,22 +25,22 @@ public class MessageDisplay : MonoBehaviour
         }
     }
 
-    private void Awake()
+ private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // puede ser persistente, no tiene PhotonView
         }
         else
         {
             Destroy(gameObject);
         }
     }
-
+    
     void Start()
     {
-        messageText.text = "";
+        if (messageText != null)
+            messageText.text = "";
     }
 
     void Update()
