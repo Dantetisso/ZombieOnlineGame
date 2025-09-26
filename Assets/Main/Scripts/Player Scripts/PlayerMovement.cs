@@ -8,20 +8,18 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 {
 #region  Variables
     [Header("Movement")]
-    [Range(0, 10)]
-    [SerializeField] private float movSpeed;
+    [SerializeField, Range(0, 10)] private float movSpeed;
     private float horizontal;
     private float vertical;
     private Vector2 dir;
 
     [Header("Evade")]
-    [Range(5, 20)]
-    [SerializeField] private float evadeForce;
-    private bool isEvading = false;
     [SerializeField] private int maxEvades;  // Máximo de cargas de esquive
-    private int currentEvades;  // Cargas disponibles
+    [SerializeField, Range(5, 20)] private float evadeForce;
     [SerializeField, Min (0.1f)] private float evadeDuration;
     [SerializeField, Min (0.1f)] private float evadeCooldown; // Tiempo de cooldown por carga de esquive
+    private bool isEvading = false;
+    private int currentEvades;  // Cargas disponibles
 
     private Rigidbody2D rb;
 
@@ -40,6 +38,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [SerializeField] private TMP_Text playerNameText;
 
     public event Action<IGun> OnChangeGun;
+    
 #endregion
 
 #region Metodos
@@ -76,9 +75,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 
             Look();
             ChangeGuns();
-            HandleEvade();
-            HandleInteract();
-            HandleLeave();
+            HandleInput();
         }
     }
 
@@ -164,33 +161,27 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         }
     }
 
-    void HandleInteract()
+    void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E))    // Interactua
         {
             ONInteract();
-        }
-    }
-    
-    void HandleEvade()
-    {
+        }     
+
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1)) && currentEvades > 0 && !isEvading)
         {
             Evade();
         }
-    }
 
-    void HandleLeave()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape)) // salir del juego
+        if (Input.GetKeyDown(KeyCode.Escape))   // sale del juego
         {
-            Application.Quit();
-        }
-            
-        if (Input.GetKeyDown(KeyCode.P)) // sale de la room y carga el mainmenu
+            Application.Quit();     
+        }   
+
+        if (Input.GetKeyDown(KeyCode.P))    // sale de la room
         {
-            RoomLeaver.Instance.LeaveRoom();
-        }
+            RoomLeaver.Instance.LeaveRoom();    
+        }   
     }
 
     void ChangeGuns()

@@ -2646,8 +2646,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movSpeed: 5
-  evadeForce: 10
   maxEvades: 2
+  evadeForce: 10
   evadeDuration: 0.3
   evadeCooldown: 2
   interactableLayer:
