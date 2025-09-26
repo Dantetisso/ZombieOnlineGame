@@ -1,9 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System;
 
-public interface IGun 
+public interface IGun
 {
-    public void Shoot();
-    public void Reload();
+    void Shoot();
+    void Reload();
+    int CurrentAmmo { get; }
+    int MaxAmmo { get; }
+    event Action<int, int> OnAmmoChange;
 }

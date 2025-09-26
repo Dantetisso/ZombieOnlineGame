@@ -2,17 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pistol : MonoBehaviour
+public class Pistol : Gun
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void HandleShooting()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            Shoot();
+        //    Debug.Log("<color=green>" + name + "</color> Tirando");
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void HandleReloading()
     {
-        
+        if (MaxAmmo > 0 && Input.GetKeyDown(KeyCode.R))
+        {
+            Reload();
+      //      Debug.Log("<color=green>" + name + "</color> Recargando");
+        }
     }
 }

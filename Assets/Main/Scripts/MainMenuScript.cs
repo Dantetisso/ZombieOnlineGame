@@ -10,13 +10,13 @@ using Photon.Realtime;
 public class MainMenuScript : MonoBehaviourPunCallbacks
 {
     [SerializeField] Button playButton;
-    [SerializeField] Button soloButton;
+    [SerializeField] Button OfflineButton;
     [SerializeField] Button quitButton;
 
     void Start()
     {
         playButton.onClick.AddListener(Play);
-        soloButton.onClick.AddListener(playo);
+        OfflineButton.onClick.AddListener(PlaySolo);
         quitButton.onClick.AddListener(quit);
     }
 
@@ -32,12 +32,6 @@ public class MainMenuScript : MonoBehaviourPunCallbacks
         SceneLoader.LoadSceneByPhoton(ScenesEnum.Level);
     }
 
-    void playo()
-    {
-        PhotonNetwork.JoinOrCreateRoom("TestRoom", new RoomOptions() { MaxPlayers = 1 }, default);
-        SceneLoader.LoadSceneByPhoton(ScenesEnum.Level);
-    }
-
     void quit()
     {
         Application.Quit();
@@ -47,8 +41,8 @@ public class MainMenuScript : MonoBehaviourPunCallbacks
     {
         if (playButton != null)
             playButton.onClick.RemoveAllListeners();
-        if (soloButton != null)
-            soloButton.onClick.RemoveAllListeners();
+        if (OfflineButton != null)
+            OfflineButton.onClick.RemoveAllListeners();
         if (quitButton != null)
             quitButton.onClick.RemoveAllListeners();
     }

@@ -14,9 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <_gunType>k__BackingField: 3
   <_damage>k__BackingField: 12
-  <_range>k__BackingField: 5
+  <_range>k__BackingField: 6
   <_IsAutomatic>k__BackingField: 0
-  <_fireFate>k__BackingField: 1
-  <_clipAmmo>k__BackingField: 6
+  <_fireFate>k__BackingField: 0.75
+  <_clipSize>k__BackingField: 8
   <_maxAmmo>k__BackingField: 30
+  <_drawSound>k__BackingField: {fileID: 8300000, guid: 7be9fbc408d5a434497fd2fb972130b9, type: 3}
   <_shootSound>k__BackingField: {fileID: 8300000, guid: e670893b02f72a1498d66993cdee2c60, type: 3}
+  <_shootEmptySound>k__BackingField: {fileID: 8300000, guid: 0bb775f96ee5eb841952214b4d41ee4d, type: 3}
+  <_reloadSound>k__BackingField: {fileID: 8300000, guid: 0e2dfd575272533499c5411b2593f999, type: 3}

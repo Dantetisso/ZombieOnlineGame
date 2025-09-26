@@ -71,7 +71,7 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
         if (myGun != null)
         {
             myGun.OnAmmoChange += UpdateAmmoText; // Agrego listener del arma actual
-            UpdateAmmoText(myGun._currentAmmo, myGun._maxAmmo); // Actualizo UI inmediatamente
+            UpdateAmmoText(myGun.CurrentAmmo, myGun.MaxAmmo); // Actualizo UI inmediatamente
         }
         else
         {

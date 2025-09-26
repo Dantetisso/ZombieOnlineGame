@@ -4,7 +4,7 @@ public class Shotgun : Gun
 {
     public override void HandleShooting()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0) && _currentAmmo > 0)
+        if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             Shoot();
         //    Debug.Log("<color=green>" + name + "</color> Tirando");
@@ -13,7 +13,7 @@ public class Shotgun : Gun
 
     public override void HandleReloading()
     {
-        if (_maxAmmo > 0 && Input.GetKeyDown(KeyCode.R))
+        if (MaxAmmo > 0 && Input.GetKeyDown(KeyCode.R))
         {
             Reload();
       //      Debug.Log("<color=green>" + name + "</color> Recargando");

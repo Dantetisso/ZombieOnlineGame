@@ -823,7 +823,6 @@ MonoBehaviour:
   zombieMask:
     serializedVersion: 2
     m_Bits: 256
-  audioSource: {fileID: 991675818729109940}
   muzzleFlash: {fileID: 7479820457217323359}
   gunEnum: 3
 --- !u!1 &3897390868079599731
@@ -1486,7 +1485,6 @@ MonoBehaviour:
   zombieMask:
     serializedVersion: 2
     m_Bits: 256
-  audioSource: {fileID: 2614540158574011217}
   muzzleFlash: {fileID: 7603190064661154718}
   gunEnum: 1
 --- !u!1 &7017117009761320811

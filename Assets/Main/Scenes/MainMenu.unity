@@ -697,7 +697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playButton: {fileID: 226355610}
-  soloButton: {fileID: 1434909063}
+  OfflineButton: {fileID: 1434909063}
   quitButton: {fileID: 778911354}
 --- !u!1 &1088284254
 GameObject:

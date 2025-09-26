@@ -16,7 +16,10 @@ MonoBehaviour:
   <_damage>k__BackingField: 5
   <_range>k__BackingField: 8
   <_IsAutomatic>k__BackingField: 1
-  <_fireFate>k__BackingField: 10
-  <_clipAmmo>k__BackingField: 30
+  <_fireFate>k__BackingField: 0.15
+  <_clipSize>k__BackingField: 30
   <_maxAmmo>k__BackingField: 150
+  <_drawSound>k__BackingField: {fileID: 8300000, guid: 594d1af722b69c64184282737ca200a0, type: 3}
   <_shootSound>k__BackingField: {fileID: 8300000, guid: 23813d26acb5ff240928d1390a0dc748, type: 3}
+  <_shootEmptySound>k__BackingField: {fileID: 8300000, guid: 0bb775f96ee5eb841952214b4d41ee4d, type: 3}
+  <_reloadSound>k__BackingField: {fileID: 8300000, guid: 0e2dfd575272533499c5411b2593f999, type: 3}
