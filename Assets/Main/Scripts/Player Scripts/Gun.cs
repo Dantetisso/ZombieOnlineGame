@@ -137,6 +137,8 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
             }
         }
 
+        Debug.DrawRay(shootPoint.position, dir * range, Color.red, 0.5f);   // Debug para ver distancia de disparo
+
         // -------------------- Feedback Local -------------------- //
 
         PlayShootSound();
