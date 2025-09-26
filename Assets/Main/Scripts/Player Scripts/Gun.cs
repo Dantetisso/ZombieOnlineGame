@@ -17,25 +17,27 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     [Header("Estadisticas del arma")]
     [SerializeField] protected GunStats gunData;
     [SerializeField] protected Transform shootPoint;
-    [SerializeField] public Sprite gunImage;
     [SerializeField] protected LayerMask zombieMask;
-    private AudioSource audioSource;
+    
+    [Header("Feedback Visual")]
     [SerializeField] protected SpriteRenderer muzzleFlash;
+    private AudioSource audioSource;
 
     private Vector2 mousePos;
     private Vector2 startPos;
 
-    protected int ammoClip;
+    private int ammoClip;
     public int CurrentAmmo { get; private set; }
     public int MaxAmmo { get; private set; }
     public event Action<int, int> OnAmmoChange;
-    protected float nextFireTime;
-    protected bool IsReloading;
-    protected float lastFireTime;
+    private float nextFireTime;
+    private bool IsReloading;
+    private bool hasAmmo;
+    private float lastFireTime;
+    // Cooldown sonido sin balas
     private float nextEmptyClickTime;
-    private float emptyClickRate = 0.3f;
+    private float emptyClickRate = 0.4f;
     [HideInInspector] public GunEnum gunEnum;
-
 
     protected PhotonView playerPhotonView; // protegido para subclases
     private Coroutine flashCoroutine;
@@ -48,6 +50,7 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
         CurrentAmmo = ammoClip;
         MaxAmmo = gunData._maxAmmo;
         gunEnum = gunData._gunType;
+        hasAmmo = true;
 
         NotifyAmmoChange();
 
@@ -61,29 +64,46 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     {
         if (!photonView.IsMine) return;
 
-        HandleShooting();
-        HandleReloading();
+        if (gunData._IsAutomatic)
+        {
+            if (Input.GetKey(KeyCode.Mouse0)) TryShoot();
+        }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.Mouse0)) TryShoot();
+        }
+
+        if (MaxAmmo > 0 && Input.GetKeyDown(KeyCode.R)) Reload();
     }
     #endregion
 
     #region Métodos
-    public abstract void HandleShooting();
-    public abstract void HandleReloading();
-    protected virtual void HandleInput() { }
+    protected virtual bool CanShoot() { return !IsReloading && Time.time >= nextFireTime; }
 
-    public virtual void Shoot()
+    protected virtual void TryShoot()
     {
-        if (IsReloading) return;
+        if (!CanShoot()) return;
 
-        if (CurrentAmmo <= 0)
+        if (CurrentAmmo > 0)
         {
-            if (Time.time >= nextEmptyClickTime)    // para controlar tiempo de reproduccion del sonido sin balas
+            Shoot();
+            Debug.Log("<Color=yellow>" + name + "</color> dispara");
+        }
+        else
+        {
+            // Cooldown para el sonido de emptyshoot
+            if (Time.time >= nextEmptyClickTime)
             {
                 PlayEmptyShootSound();
                 nextEmptyClickTime = Time.time + emptyClickRate;
             }
-            return;
         }
+        
+    }
+
+    public virtual void Shoot()
+    {
+        if (IsReloading) return;
 
         if (Time.time < nextFireTime) return;       // Cadencia de fuego
 
@@ -130,6 +150,8 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
             playerPhotonView.RPC(nameof(PlayerGunSync.RPC_PlayShootSound), RpcTarget.Others);
             playerPhotonView.RPC(nameof(PlayerGunSync.RPC_ShowMuzzleFlash), RpcTarget.Others);
         }
+
+        hasAmmo = CurrentAmmo < 0;
     }
 
     public virtual void Reload()
@@ -147,6 +169,8 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
         PlayReloadSound();
         NotifyAmmoChange();
         IsReloading = false;
+
+        hasAmmo = CurrentAmmo > 0;
     }
 
     public virtual void GetAmmo() => MaxAmmo += ammoClip;

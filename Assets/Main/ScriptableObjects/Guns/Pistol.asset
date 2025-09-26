@@ -20,6 +20,6 @@ MonoBehaviour:
   <_clipSize>k__BackingField: 7
   <_maxAmmo>k__BackingField: 35
   <_drawSound>k__BackingField: {fileID: 8300000, guid: 12b8f22f8be52e646a9d6da47b8303ae, type: 3}
-  <_shootSound>k__BackingField: {fileID: 8300000, guid: 348e6b5b2b260c945b135fc37d653ede, type: 3}
+  <_shootSound>k__BackingField: {fileID: 8300000, guid: 7c0171b7022365642b501a0322d3c630, type: 3}
   <_shootEmptySound>k__BackingField: {fileID: 8300000, guid: 3bba5be56042f7c41863948b4c671a6b, type: 3}
   <_reloadSound>k__BackingField: {fileID: 8300000, guid: c366540cfe567684491d64cab302be0c, type: 3}

@@ -38,7 +38,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [SerializeField] private GameObject localHUD;
     [SerializeField] private TMP_Text playerNameText;
 
-    public event Action<Gun> OnChangeGun;
+    public event Action<IGun> OnChangeGun;
 #endregion
 
 #region Metodos
@@ -197,8 +197,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         {
             ChangeGunWithSync(GunEnum.AutomaticRifle);
         }
-
         if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            ChangeGunWithSync(GunEnum.Pistol);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             ChangeGunWithSync(GunEnum.Shotgun);
         }

@@ -10,7 +10,7 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
 
     private HealthScript health;
     private PlayerMovement player;
-    private Gun myGun;
+    private IGun myGun;
 
     void Awake()
     {
@@ -59,7 +59,7 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
     }
 
     // Inicializa o cambia el arma en la UI
-    public void InitGun(Gun gun)
+    public void InitGun(IGun gun)
     {
         if (myGun != null)
         {
