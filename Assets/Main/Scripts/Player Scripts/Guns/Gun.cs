@@ -27,11 +27,11 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     private Vector2 startPos;
 
     private int ammoClip;
-    public int CurrentAmmo { get; private set; }
+    public int CurrentAmmo { get; protected set; }
     public int MaxAmmo { get; private set; }
     public event Action<int, int> OnAmmoChange;
-    private float nextFireTime;
-    private bool IsReloading;
+    protected float nextFireTime;
+    protected bool IsReloading;
     private bool hasAmmo;
     private float lastFireTime;
     // Cooldown sonido sin balas

@@ -103,10 +103,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         {
             cameraFollow.SetPlayer(transform);
         }
-        else
-        {
-            Debug.LogError("falta el script CameraWork en Main Camera.");
-        }
 
         photonView.RPC("RPC_SetPlayerName", RpcTarget.AllBuffered, PhotonNetwork.NickName);
 
@@ -264,7 +260,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             if (items.TryGetComponent(out IInteractable interactable))
             {
                 interactable.Interact();
-                Debug.Log("Toque: " + "<color=green>" + " " + interactable + "</color>");
+                Debug.Log("Toque: <color=green>" + interactable + "</color>");
             }
         }
     }

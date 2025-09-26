@@ -15,5 +15,9 @@ public class GunStats : ScriptableObject
     [field: SerializeField] public AudioClip _drawSound { get; private set; }
     [field: SerializeField] public AudioClip _shootSound { get; private set; }
     [field: SerializeField] public AudioClip _shootEmptySound { get; private set; }
-    [field: SerializeField] public AudioClip _reloadSound{ get; private set; }
+    [field: SerializeField] public AudioClip _reloadSound { get; private set; }
+
+    // NUEVOS campos para escopeta:
+    [field: SerializeField] public int _pellets { get; private set; }           // nº de perdigones
+    [field: SerializeField] public float _spreadAngle { get; private set; } 
 }
