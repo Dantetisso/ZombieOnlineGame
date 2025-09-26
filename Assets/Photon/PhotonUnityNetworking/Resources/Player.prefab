@@ -908,7 +908,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   muzzleFlash: {fileID: 7479820457217323359}
-  gunEnum: 3
 --- !u!1 &3897390868079599731
 GameObject:
   m_ObjectHideFlags: 0
@@ -1213,7 +1212,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   muzzleFlash: {fileID: 174395146213097191}
-  gunEnum: 1
 --- !u!1 &4275914521371343781
 GameObject:
   m_ObjectHideFlags: 0
@@ -1803,7 +1801,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   muzzleFlash: {fileID: 7603190064661154718}
-  gunEnum: 1
 --- !u!1 &7017117009761320811
 GameObject:
   m_ObjectHideFlags: 0

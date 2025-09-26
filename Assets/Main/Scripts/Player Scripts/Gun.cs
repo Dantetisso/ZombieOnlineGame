@@ -18,7 +18,7 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     [SerializeField] protected GunStats gunData;
     [SerializeField] protected Transform shootPoint;
     [SerializeField] protected LayerMask zombieMask;
-    
+
     [Header("Feedback Visual")]
     [SerializeField] protected SpriteRenderer muzzleFlash;
     private AudioSource audioSource;
@@ -36,8 +36,8 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     private float lastFireTime;
     // Cooldown sonido sin balas
     private float nextEmptyClickTime;
-    private float emptyClickRate = 0.4f;
-    [HideInInspector] public GunEnum gunEnum;
+    private float emptyClickRate = 0.3f;
+    public GunEnum gunEnum => gunData._gunType;
 
     protected PhotonView playerPhotonView; // protegido para subclases
     private Coroutine flashCoroutine;
@@ -49,7 +49,6 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
         ammoClip = gunData._clipSize;
         CurrentAmmo = ammoClip;
         MaxAmmo = gunData._maxAmmo;
-        gunEnum = gunData._gunType;
         hasAmmo = true;
 
         NotifyAmmoChange();
