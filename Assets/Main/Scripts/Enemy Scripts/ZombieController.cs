@@ -6,10 +6,10 @@ using Photon.Pun;
 public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
 {
     [Header("References")]
-    public NavMeshAgent navAgent; // público para acceso desde spawner
-    public HealthScript health;
-    public LineOfSightMono lineOfSight;
     public EnemyStats enemyStats; // público para acceso desde spawner
+    NavMeshAgent navAgent; // público para acceso desde spawner
+    HealthScript health;
+    LineOfSightMono lineOfSight;
 
     [Header("Patrol Settings")]
     private Transform[] patrolWaypoints;

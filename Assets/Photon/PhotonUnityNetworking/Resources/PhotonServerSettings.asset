@@ -68,6 +68,8 @@ MonoBehaviour:
   - RPC_DealDamage
   - TakeDamageRPC
   - UpdateHealthRPC
+  - RPC_FlashRed
+  - RPC_DamageFeedback
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -20,7 +20,6 @@ GameObject:
   - component: {fileID: 4367403749330729693}
   - component: {fileID: 1324849309873064815}
   - component: {fileID: 2606976743667506008}
-  - component: {fileID: 7323424294212425149}
   m_Layer: 8
   m_Name: Boss
   m_TagString: Boss
@@ -293,23 +292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36699fe7e05011744893d86952bd0725, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  navAgent: {fileID: 0}
-  health: {fileID: 0}
-  lineOfSight: {fileID: 0}
   enemyStats: {fileID: 11400000, guid: 3325ff33bc1267d4cbcf356485d7b728, type: 2}
---- !u!114 &7323424294212425149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2643109736072550674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab79a6889daecf24c8880a7f59bb4727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 1650658337178217681}
 --- !u!1 &3382354808654727446
 GameObject:
   m_ObjectHideFlags: 0

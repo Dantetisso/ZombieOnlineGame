@@ -20,8 +20,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     private bool isEvading = false;
     [SerializeField] private int maxEvades;  // Máximo de cargas de esquive
     private int currentEvades;  // Cargas disponibles
-    private float evadeDuration;
-    [SerializeField] private float evadeCooldown; // Tiempo de cooldown por carga de esquive
+    [SerializeField, Min (0.1f)] private float evadeDuration;
+    [SerializeField, Min (0.1f)] private float evadeCooldown; // Tiempo de cooldown por carga de esquive
 
     private Rigidbody2D rb;
 
@@ -36,6 +36,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     
     [Header("UI")]
     [SerializeField] private GameObject localHUD;
+    [SerializeField] private GameObject netWorkHUD;
     [SerializeField] private TMP_Text playerNameText;
 
     public event Action<IGun> OnChangeGun;
@@ -99,6 +100,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         cameraFollow = mainCamera.GetComponent<CameraWork>();
 
         localHUD.SetActive(true);
+        netWorkHUD.SetActive(false);
 
         if (cameraFollow != null)
         {
@@ -125,7 +127,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         if (camera != null) camera.gameObject.SetActive(false);
 
         localHUD.SetActive(false);
-
+        netWorkHUD.SetActive(true);
     }
 
     void Look()
@@ -172,7 +174,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     
     void HandleEvade()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1) && currentEvades > 0 && !isEvading)
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1)) && currentEvades > 0 && !isEvading)
         {
             Evade();
         }

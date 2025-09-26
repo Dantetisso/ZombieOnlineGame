@@ -42,7 +42,7 @@ public class HealthScript : MonoBehaviourPun, IDamageable
         if (currentHealth < 0) currentHealth = 0;
 
         photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, currentHealth, maxHealth);
-        StartCoroutine(FlashRed());
+        photonView.RPC(nameof(RPC_DamageFeedback), RpcTarget.All);
 
         if (currentHealth <= 0 && !isDead)
         {
@@ -51,7 +51,7 @@ public class HealthScript : MonoBehaviourPun, IDamageable
         }
     }
 
-    private IEnumerator FlashRed()
+    private IEnumerator DamageFeedback()
     {
         if (_renderer == null) yield break;
 
@@ -84,6 +84,12 @@ public class HealthScript : MonoBehaviourPun, IDamageable
             photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered);
         else
             photonView.RPC(nameof(RPC_ZombieDied), RpcTarget.MasterClient, photonView.ViewID);
+    }
+
+    [PunRPC]
+    private void RPC_DamageFeedback()
+    {
+        StartCoroutine(DamageFeedback());
     }
 
     [PunRPC]
