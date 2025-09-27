@@ -125,7 +125,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         OnAlivePlayersChanged?.Invoke(alivePlayers);
 
         if (PhotonNetwork.IsMasterClient && alivePlayers <= 0)
-            PhotonNetwork.LoadLevel(ScenesEnum.GameOver.ToString());
+            PhotonNetwork.LoadLevel((nameof(ScenesEnum.GameOver)));
     }
 
     private void Victory()
