@@ -33,7 +33,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -42,7 +42,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -105,13 +105,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Sprite Zombie Default Walk_0
+      name: Zombie_Walk_0
       rect:
         serializedVersion: 2
         x: 202
-        y: 349
-        width: 135
-        height: 212
+        y: 350
+        width: 134
+        height: 211
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -119,20 +119,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: dedaec8cbec7cca4fa20d516348d8775
-      internalID: -493739886
+      spriteID: 38e89178ab73d50449c53cad107c426b
+      internalID: -1937752184
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprite Zombie Default Walk_1
+      name: Zombie_Walk_1
       rect:
         serializedVersion: 2
         x: 902
-        y: 349
-        width: 135
-        height: 212
+        y: 350
+        width: 134
+        height: 211
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,20 +140,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c05fa625718077145a58803a447d0769
-      internalID: 1285496678
+      spriteID: 8efe8b19ee6ba4c449ccff90b2996163
+      internalID: 1238410777
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprite Zombie Default Walk_2
+      name: Zombie_Walk_2
       rect:
         serializedVersion: 2
         x: 1602
-        y: 349
-        width: 135
-        height: 212
+        y: 350
+        width: 134
+        height: 211
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -161,20 +161,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b62dcefbd58009e4b8a7c430f4d238fd
-      internalID: -1898531774
+      spriteID: adf49adcce49ab94a8ab7b3aabf9be21
+      internalID: -305513274
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprite Zombie Default Walk_3
+      name: Zombie_Walk_3
       rect:
         serializedVersion: 2
         x: 2302
-        y: 349
-        width: 135
-        height: 212
+        y: 350
+        width: 134
+        height: 211
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -182,8 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 11395d34101cf4d47a1ce0050e739ece
-      internalID: 1106367471
+      spriteID: fc422f4dd34461648adf6c81fe6742f7
+      internalID: 411871961
       vertices: []
       indices: 
       edges: []
@@ -199,10 +199,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Sprite Zombie Default Walk_1: 1285496678
-      Sprite Zombie Default Walk_0: -493739886
-      Sprite Zombie Default Walk_3: 1106367471
-      Sprite Zombie Default Walk_2: -1898531774
+      Zombie_Walk_1: 1238410777
+      Zombie_Walk_2: -305513274
+      Zombie_Walk_0: -1937752184
+      Zombie_Walk_3: 411871961
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
