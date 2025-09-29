@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -6,37 +5,36 @@ using TMPro;
 public class MessageDisplay : MonoBehaviour
 {
     public static MessageDisplay Instance;
-
+    
     [SerializeField] private TMP_Text messageText;
     [SerializeField] private float messageLifetime = 5f; // Tiempo que dura cada mensaje
     [SerializeField] private int maxMessages = 5;
 
-    private List<MessageEntry> messages = new List<MessageEntry>(); // lista de clase mensajes
+    // Ahora guardamos también el color del mensaje
+    private List<MessageEntry> messages = new List<MessageEntry>();
 
-    private class MessageEntry // me guardo la duracion del texto y lo que dice en esta clase
+    private class MessageEntry
     {
         public string text;
+        public Color color;
         public float timeRemaining;
 
-        public MessageEntry(string text, float duration)
+        public MessageEntry(string text, Color color, float duration)
         {
             this.text = text;
+            this.color = color;
             this.timeRemaining = duration;
         }
     }
 
- private void Awake()
+    private void Awake()
     {
         if (Instance == null)
-        {
             Instance = this;
-        }
         else
-        {
             Destroy(gameObject);
-        }
     }
-    
+
     void Start()
     {
         if (messageText != null)
@@ -50,7 +48,6 @@ public class MessageDisplay : MonoBehaviour
         for (int i = messages.Count - 1; i >= 0; i--)
         {
             messages[i].timeRemaining -= Time.deltaTime;
-
             if (messages[i].timeRemaining <= 0)
             {
                 messages.RemoveAt(i);
@@ -59,22 +56,37 @@ public class MessageDisplay : MonoBehaviour
         }
 
         if (changed)
-            UpdateUIText();
-    }
-
-    public void AddMessage(string message)
-    {
-        if (messages.Count >= maxMessages)
         {
-            messages.RemoveAt(0);
+            UpdateUIText();
         }
 
-        messages.Add(new MessageEntry(message, messageLifetime));
+    }
+
+    // Nuevo AddMessage: acepta string y Color
+    public void AddMessageWithColor(string message, Color color)
+    {
+        if (messages.Count >= maxMessages)
+            messages.RemoveAt(0);
+
+        messages.Add(new MessageEntry(message, color, messageLifetime));
         UpdateUIText();
+    }
+
+    // Mantener compatibilidad: color blanco por defecto
+    public void AddMessage(string message)
+    {
+        AddMessageWithColor(message, Color.white);
     }
 
     private void UpdateUIText()
     {
-        messageText.text = string.Join("\n", messages.ConvertAll(m => m.text));
+        // Construimos con etiquetas <color>
+        List<string> lines = new List<string>();
+        foreach (var m in messages)
+        {
+            string hex = ColorUtility.ToHtmlStringRGB(m.color);
+            lines.Add($"<color=#{hex}>{m.text}</color>");
+        }
+        messageText.text = string.Join("\n", lines);
     }
 }

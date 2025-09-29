@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
@@ -15,15 +13,19 @@ public class MessageBroadcaster : MonoBehaviourPun // se encarga de conectar el 
             Destroy(gameObject);
     }
 
-    public void BroadcastMessageToAll(string msg)
+    public void BroadcastMessageToAll(string msg, Color color)
     {
-        photonView.RPC(nameof(RPC_ShowMessage), RpcTarget.All, msg);
+        string colorHex = ColorUtility.ToHtmlStringRGB(color);
+        photonView.RPC(nameof(RPC_ShowMessage), RpcTarget.All, msg, colorHex);
     }
 
     [PunRPC]
-    private void RPC_ShowMessage(string msg)
+    private void RPC_ShowMessage(string msg, string colorHex)
     {
-        MessageDisplay.Instance?.AddMessage(msg);
+        if (!ColorUtility.TryParseHtmlString($"#{colorHex}", out var color))
+            color = Color.white;
+
+        MessageDisplay.Instance?.AddMessageWithColor(msg, color);
     }
 }
 
