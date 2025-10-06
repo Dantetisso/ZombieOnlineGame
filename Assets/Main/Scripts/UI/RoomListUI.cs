@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
 
 public class RoomListUI : MonoBehaviour
 {
@@ -16,19 +17,19 @@ public class RoomListUI : MonoBehaviour
 
     [Header("Slots de salas")]
     [SerializeField] public RoomSlot[] slots;
+    public GameObject warningtext;
+    private float warningTime = 2f;
 
     public bool canplayAlone = false;
 
     private void OnEnable()
     {
-        if (ConnectionManager.Instance != null)
-            ConnectionManager.Instance.photonManager.OnNewRoomCreated += SafeUpdateRoomList;
+        if (ConnectionManager.Instance != null) ConnectionManager.Instance.photonManager.OnNewRoomCreated += SafeUpdateRoomList;
     }
 
     private void OnDisable()
     {
-        if (ConnectionManager.Instance != null)
-            ConnectionManager.Instance.photonManager.OnNewRoomCreated -= SafeUpdateRoomList;
+        if (ConnectionManager.Instance != null) ConnectionManager.Instance.photonManager.OnNewRoomCreated -= SafeUpdateRoomList;
     }
 
     private void SafeUpdateRoomList(List<RoomInfo> rooms) // asegurar de limpiar suscripciones 
@@ -67,12 +68,22 @@ public class RoomListUI : MonoBehaviour
                         ConnectionManager.Instance.JoinSelectedRoom(room.Name);
                         MainMenuStarter.hasRequestedJoinRoom = true;
                     }
+                    
+                    if (room.PlayerCount >= room.MaxPlayers && slot.joinButton.IsInvoking()) StartCoroutine(WarningText());
                 });
             }
         }
     }
 
-[ContextMenu("Can Play Alone")]
+    IEnumerator WarningText()
+    {
+        warningtext.SetActive(true);
+        yield return new WaitForSeconds(warningTime);
+        warningtext.SetActive(false);
+    }
+
+
+[ContextMenu("Can Play Alone")] // para usar para jugar solo
     public void CanPlayAlone()
     {
         canplayAlone = true;
