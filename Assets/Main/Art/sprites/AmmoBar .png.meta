@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 7809a3f0b334fa24b90da56cd7e8df05
+guid: 611dc4681557f294ebfadcd9f71b8542
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -105,7 +105,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: AmmoBar_0
+      name: AmmoBar _0
       rect:
         serializedVersion: 2
         x: 0
@@ -119,14 +119,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9bb0486a2a80d8848a11957e4837be24
-      internalID: -2002966509
+      spriteID: 1ee87b7af0bc35b4584f521188020b5d
+      internalID: -968976645
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AmmoBar_1
+      name: AmmoBar _1
       rect:
         serializedVersion: 2
         x: 0
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6eb5b9d885204a84b910b30d7c415bf7
-      internalID: -2014517530
+      spriteID: b7a5586aeb65e454997e5d88e6932d9b
+      internalID: 1173855850
       vertices: []
       indices: 
       edges: []
@@ -157,8 +157,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      AmmoBar_0: -2002966509
-      AmmoBar_1: -2014517530
+      AmmoBar _1: 1173855850
+      AmmoBar _0: -968976645
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
