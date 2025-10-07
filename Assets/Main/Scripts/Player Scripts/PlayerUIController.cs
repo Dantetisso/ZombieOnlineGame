@@ -6,11 +6,13 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
 {
     [SerializeField] private Image healthBar;
     [SerializeField] private Image evadeBar;
-    [SerializeField] private TMP_Text ammoCountText;
+    [SerializeField] private Image ammoBar;
+    [SerializeField] private TMP_Text ammoClipText;
+    [SerializeField] private TMP_Text ammoReserveText;
 
     private HealthScript health;
     private PlayerMovement player;
-    private IGun myGun;
+    private Gun myGun;
 
     void Awake()
     {
@@ -59,7 +61,7 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
     }
 
     // Inicializa o cambia el arma en la UI
-    public void InitGun(IGun gun)
+    public void InitGun(Gun gun)
     {
         if (myGun != null)
         {
@@ -76,7 +78,8 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
         else
         {
             // Si no hay arma activa, limpia el texto
-            ammoCountText.text = "0 / 0";
+            ammoClipText.text = "0";
+            ammoReserveText.text ="0";
         }
     }
 
@@ -92,6 +95,9 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
 
     private void UpdateAmmoText(int clip, int reserve)
     {
-        ammoCountText.text = clip + " / " + reserve;
+        ammoClipText.text = clip.ToString();
+        ammoReserveText.text = reserve.ToString();
+
+        ammoBar.fillAmount = (float)clip / myGun.fullAmmoClip;
     }
 }

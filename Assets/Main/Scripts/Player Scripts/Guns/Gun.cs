@@ -27,6 +27,7 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     private Vector2 startPos;
 
     private int ammoClip;
+    public int fullAmmoClip;
     public int CurrentAmmo { get; protected set; }
     public int MaxAmmo { get; private set; }
     public event Action<int, int> OnAmmoChange;
@@ -50,6 +51,7 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
         CurrentAmmo = ammoClip;
         MaxAmmo = gunData._maxAmmo;
         hasAmmo = true;
+        fullAmmoClip = ammoClip;
 
         NotifyAmmoChange();
 
@@ -77,7 +79,10 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     #endregion
 
     #region Métodos
-    protected virtual bool CanShoot() { return !IsReloading && Time.time >= nextFireTime; }
+    protected virtual bool CanShoot()
+    {
+        return !IsReloading && Time.time >= nextFireTime;
+    }
 
     protected virtual void TryShoot()
     {

@@ -37,7 +37,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [SerializeField] private GameObject netWorkHUD;
     [SerializeField] private TMP_Text playerNameText;
 
-    public event Action<IGun> OnChangeGun;
+    public event Action<Gun> OnChangeGun;
     
 #endregion
 
