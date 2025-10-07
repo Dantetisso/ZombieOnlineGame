@@ -1,6 +1,5 @@
 using UnityEngine;
 using TMPro;
-using Unity.VisualScripting;
 
 public class LevelUIController : MonoBehaviour // maneja UI del nivel
 {
