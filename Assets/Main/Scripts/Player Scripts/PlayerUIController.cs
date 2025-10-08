@@ -7,6 +7,7 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
     [SerializeField] private Image healthBar;
     [SerializeField] private Image evadeBar;
     [SerializeField] private Image ammoBar;
+    [SerializeField] private Image gunImage;
     [SerializeField] private TMP_Text ammoClipText;
     [SerializeField] private TMP_Text ammoReserveText;
 
@@ -74,12 +75,13 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
         {
             myGun.OnAmmoChange += UpdateAmmoText; // Agrego listener del arma actual
             UpdateAmmoText(myGun.CurrentAmmo, myGun.MaxAmmo); // Actualizo UI inmediatamente
+            myGun.SetUIImage(gunImage);
         }
         else
         {
             // Si no hay arma activa, limpia el texto
             ammoClipText.text = "0";
-            ammoReserveText.text ="0";
+            ammoReserveText.text = "0";
         }
     }
 

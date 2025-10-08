@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Photon.Pun;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum GunEnum
 {
@@ -27,7 +28,7 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
     private Vector2 startPos;
 
     private int ammoClip;
-    public int fullAmmoClip;
+    public int fullAmmoClip{ get; private set; }
     public int CurrentAmmo { get; protected set; }
     public int MaxAmmo { get; private set; }
     public event Action<int, int> OnAmmoChange;
@@ -201,6 +202,11 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
         muzzleFlash.enabled = true;
         yield return new WaitForSeconds(0.1f);
         muzzleFlash.enabled = false;
+    }
+
+    public void SetUIImage(Image image)
+    {
+        image.sprite = gunData._gunImage;    
     }
 
     public void PlayShootSound()

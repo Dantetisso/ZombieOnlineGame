@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Gun", menuName = ("Scriptable Objects/Guns"))]
 public class GunStats : ScriptableObject
 {
+    [field: SerializeField] public Sprite _gunImage { get; private set; }
     [field: SerializeField] public GunEnum _gunType { get; private set; }
     [field: SerializeField] public int _damage { get; private set; }
     [field: SerializeField] public int _range { get; private set; }
@@ -17,7 +16,7 @@ public class GunStats : ScriptableObject
     [field: SerializeField] public AudioClip _shootEmptySound { get; private set; }
     [field: SerializeField] public AudioClip _reloadSound { get; private set; }
 
-    // NUEVOS campos para escopeta:
+    // campos de la escopeta:
     [field: SerializeField] public int _pellets { get; private set; }           // nº de perdigones
-    [field: SerializeField] public float _spreadAngle { get; private set; } 
+    [field: SerializeField] public float _spreadAngle { get; private set; }     // angulo perdigones
 }

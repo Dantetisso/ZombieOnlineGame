@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6ca7c299f9152948a7ba5768b145681, type: 3}
   m_Name: Shotgun
   m_EditorClassIdentifier: 
+  <_gunImage>k__BackingField: {fileID: 21300000, guid: b268c114a4733c84b97e05adf6fed18c, type: 3}
   <_gunType>k__BackingField: 3
   <_damage>k__BackingField: 12
   <_range>k__BackingField: 5
