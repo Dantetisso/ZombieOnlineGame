@@ -2363,7 +2363,7 @@ MonoBehaviour:
   waveText: {fileID: 524750999}
   zombieCountText: {fileID: 264892009}
   playersAliveText: {fileID: 1704152475}
-  bossWarningObject: {fileID: 1609872900}
+  bossWarningTextObject: {fileID: 1609872900}
   gameManager: {fileID: 1359747420}
 --- !u!114 &1025449342
 MonoBehaviour:
