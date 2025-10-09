@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 {
     [Header("Configuración del juego")]
     [SerializeField] private GameConfig gameConfig;
+    [SerializeField] private LevelUIController lvlUI;
 
     private int maxWaves;
     private int baseZombies;
@@ -91,6 +92,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         // Sincronizar con todos los clientes
         photonView.RPC(nameof(RPC_UpdateWaveInfo), RpcTarget.Others, currentWave, amount, isBossWave);
         photonView.RPC(nameof(RPC_UpdateZombiesAlive), RpcTarget.Others, zombiesAlive);
+        photonView.RPC(nameof(RPC_ActivateBossWarning), RpcTarget.All, isBossWave);  // Activar el GameObject en rondas de boss
     }
 
     public void OnZombieDied(bool wasBoss)
@@ -151,5 +153,12 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void RPC_UpdateZombiesAlive(int alive)
     {
         OnZombiesAliveChanged?.Invoke(alive);
+    }
+
+    [PunRPC]
+    private void RPC_ActivateBossWarning(bool isBossWave)
+    {
+        // Sincronizamos el estado del GameObject para que se encienda o apague en todos los clientes
+        lvlUI.SetBossWarningActive(isBossWave);
     }
 }

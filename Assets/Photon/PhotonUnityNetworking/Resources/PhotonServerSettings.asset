@@ -70,6 +70,8 @@ MonoBehaviour:
   - UpdateHealthRPC
   - RPC_FlashRed
   - RPC_DamageFeedback
+  - RPC_UpdateBossMessage
+  - RPC_ActivateBossWarning
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
