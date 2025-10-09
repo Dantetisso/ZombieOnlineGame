@@ -77,13 +77,21 @@ public class ConnectionManager : MonoBehaviourPunCallbacks // conecta entre el j
     public void HandleNewPlayerInRoom(Player player)
     {
         OnPlayerEnterRoom?.Invoke();
-        LobbyMesenger.PlayerEnterMessage(player.NickName);
+        
+        if (PhotonNetwork.IsMasterClient)
+        {
+            LobbyMesenger.PlayerEnterMessage(player.NickName);
+        }
     }
                                                             // manejan la entrada y salida de jugadores
     public void HandlePlayerLeftRoom(Player player)
     {
         OnPlayerLeaveRoom?.Invoke();
-        LobbyMesenger.PlayerLeftMessage(player.NickName);
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            LobbyMesenger.PlayerLeftMessage(player.NickName);
+        }
     }
 
     public void CreateRoom(string roomName) //el room options esta en el script photonconectionmanager
