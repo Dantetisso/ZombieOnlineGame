@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 {
-#region  Variables
+    #region  Variables
     [Header("Movement")]
     [SerializeField, Range(0, 10)] private float movSpeed;
     private float horizontal;
@@ -17,8 +17,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [Header("Evade")]
     [SerializeField] private int maxEvades;  // Máximo de cargas de esquive
     [SerializeField, Range(5, 20)] private float evadeForce;
-    [SerializeField, Min (0.1f)] private float evadeDuration;
-    [SerializeField, Min (0.1f)] private float evadeCooldown; // Tiempo de cooldown por carga de esquive
+    [SerializeField, Min(0.1f)] private float evadeDuration;
+    [SerializeField, Min(0.1f)] private float evadeCooldown; // Tiempo de cooldown por carga de esquive
     private bool isEvading = false;
     private int currentEvades;  // Cargas disponibles
 
@@ -41,18 +41,17 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     private float attackTimer;
     private float nextAttackTime;
     private bool IsAttacking;
-    
+
     private Gun activeGun;
     private HealthScript health;
     private Camera mainCamera;
-    
+
     [Header("UI")]
     [SerializeField] private GameObject localHUD;
     [SerializeField] private GameObject netWorkHUD;
     [SerializeField] private TMP_Text playerNameText;
 
     public event Action<Gun> OnChangeGun;
-
     #endregion
 
     #region Metodos
@@ -67,7 +66,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         if (photonView.IsMine || !PhotonNetwork.IsConnected)
         {
             SetupLocalPlayer();
-            
+
             var gun = GetComponentInChildren<Gun>();
             activeGun = gun;          // asigna el arma activa
             OnChangeGun?.Invoke(activeGun); // dispara evento a UI
@@ -77,7 +76,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             SetupRemotePlayer();
         }
     }
-    
+
     void Update()
     {
         if (photonView.IsMine)
@@ -94,7 +93,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             if (IsAttacking)
             {
                 attackTimer -= Time.deltaTime;
-                if (attackTimer <=0)
+                if (attackTimer <= 0)
                 {
                     attackFeedback.SetActive(false);
                     IsAttacking = false;
@@ -107,11 +106,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     {
         if (photonView.IsMine)
         {
-            if (isEvading)
-            {
-                return;
-            }
-
+            if (isEvading) return;
             Move();
         }
     }
@@ -124,9 +119,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         netWorkHUD.SetActive(false);
 
         if (cameraFollow != null)
-        {
             cameraFollow.SetPlayer(transform);
-        }
 
         photonView.RPC("RPC_SetPlayerName", RpcTarget.AllBuffered, PhotonNetwork.NickName);
 
@@ -140,7 +133,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     private void SetupRemotePlayer()
     {
         Camera camera = GetComponentInChildren<Camera>();
-
         if (camera != null) camera.gameObject.SetActive(false);
 
         localHUD.SetActive(false);
@@ -149,8 +141,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 
     void Look()
     {
-        if (!photonView.IsMine) return; // chequeo x las dudas
-
+        if (!photonView.IsMine) return;
         if (mainCamera == null) return;
 
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -158,10 +149,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 
         Vector2 direction = (mouseWorldPos - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-
         transform.rotation = Quaternion.Euler(0, 0, angle);
     }
-   
+
     void Move()
     {
         rb.velocity = dir.normalized * movSpeed;
@@ -183,46 +173,23 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 
     void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.E))    // Interactua
-        {
-            ONInteract();
-        }     
+        if (Input.GetKeyDown(KeyCode.E)) ONInteract();
 
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1)) && currentEvades > 0 && !isEvading)
-        {
             Evade();
-        }
 
-        if (Input.GetKeyDown(KeyCode.Escape))   // sale del juego
-        {
-            Application.Quit();     
-        }
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
-        if (Input.GetKeyDown(KeyCode.P))    // sale de la room
-        {
-            RoomLeaver.Instance.LeaveRoom();
-        }
-        
-        if (Input.GetKeyDown(KeyCode.V)) 
-        {
-            MeleeAttack(); 
-        }
+        if (Input.GetKeyDown(KeyCode.P)) RoomLeaver.Instance.LeaveRoom();
+
+        if (Input.GetKeyDown(KeyCode.V)) MeleeAttack();
     }
 
     void ChangeGuns()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            ChangeGunWithSync(GunEnum.AutomaticRifle);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            ChangeGunWithSync(GunEnum.Pistol);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            ChangeGunWithSync(GunEnum.Shotgun);
-        }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) ChangeGunWithSync(GunEnum.AutomaticRifle);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) ChangeGunWithSync(GunEnum.Pistol);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) ChangeGunWithSync(GunEnum.Shotgun);
     }
 
     private void ChangeGunWithSync(GunEnum type)
@@ -238,11 +205,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         {
             if (gun == null) continue;
             gun.gameObject.SetActive(gun.gunEnum == type);
-
-            if (gun.gunEnum == type)
-            {
-                newGun = gun;
-            }
+            if (gun.gunEnum == type) newGun = gun;
         }
 
         if (newGun != null)
@@ -250,7 +213,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             activeGun = newGun;
             OnChangeGun?.Invoke(activeGun);
 
-            // Solo actualiza UI local
             if (photonView.IsMine || !PhotonNetwork.IsConnected)
             {
                 var ui = GetComponentInChildren<PlayerUIController>();
@@ -268,11 +230,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     IEnumerator ReloadEvade()
     {
         yield return new WaitForSeconds(evadeCooldown);
-
-        if (currentEvades < maxEvades) // Solo se recargan si hay menos del maximo de cargas
-        {
-            currentEvades++;
-        }
+        if (currentEvades < maxEvades) currentEvades++;
     }
 
     public float GetEvadeTime()
@@ -303,14 +261,34 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         IsAttacking = true;
         attackTimer = attackDuration;
 
-        Collider2D coll = Physics2D.OverlapBox(attackPoint.position, new Vector2(attackRange, attackRange), 0f, enemyLayer);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(attackPoint.position, new Vector2(attackRange, attackRange), 0f, enemyLayer);
 
-        if (coll != null)
+        // Ataca enemigos
+        foreach (var coll in colliders)
         {
-            coll.gameObject.TryGetComponent(out IDamageable damageable);
-            damageable.TakeDamage(attackDamage);
-            
+            if (coll == null) continue;
+
+            if (PhotonNetwork.IsConnected && photonView.IsMine)
+            {
+                var enemy = coll.GetComponent<PhotonView>();
+                
+                if (enemy != null)
+                {
+                    photonView.RPC(nameof(RPC_MeleeAttack), RpcTarget.MasterClient, enemy.ViewID, attackDamage);
+                }
+            }
+            else
+            {
+                if (coll.TryGetComponent(out IDamageable dmg)) 
+                {
+                    dmg.TakeDamage(attackDamage);
+                }
+            }
         }
+
+        // Feedback visual solo 1 vez
+        if (photonView.IsMine && PhotonNetwork.IsConnected)
+            photonView.RPC(nameof(RPC_PlayAttackFeedback), RpcTarget.Others, attackDuration);
 
         nextAttackTime = Time.time + attackCooldown;
     }
@@ -319,19 +297,43 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     {
         health.TakeDamage(damage);
     }
-#endregion
+    #endregion
 
-#region RPCs
+    #region RPCs
     [PunRPC]
     void RPC_ChangeGun(GunEnum type)
     {
         ChangeGun(type);
     }
-   
+
     [PunRPC]
     public void RPC_SetPlayerName(string playerName)
     {
         playerNameText.text = playerName;
+    }
+
+    [PunRPC]
+    public void RPC_MeleeAttack(int enemyViewID, int dmg)
+    {
+        PhotonView enemyPhoton = PhotonView.Find(enemyViewID);
+        if (enemyPhoton != null && enemyPhoton.TryGetComponent(out IDamageable damageable))
+        {
+            damageable.TakeDamage(dmg);
+        }
+    }
+
+    [PunRPC]
+    void RPC_PlayAttackFeedback(float duration)
+    {
+        attackFeedback.SetActive(true);
+        StartCoroutine(DisableFeedbackAfter(duration));
+
+    }
+
+    IEnumerator DisableFeedbackAfter(float time)
+    {
+        yield return new WaitForSeconds(time);
+        attackFeedback.SetActive(false);
     }
     #endregion
 

@@ -61,7 +61,7 @@ public class Lobby : MonoBehaviourPunCallbacks
         }
 
     //  startGameButton.interactable = orderedPlayers.Count >= 2 && orderedPlayers.Count <= 4;        // el boton se prende si esta la cantidad de jugadores
-        Debug.Log($"[Lobby] Jugadores en la sala: {orderedPlayers.Count}");
+//        Debug.Log($"[Lobby] Jugadores en la sala: {orderedPlayers.Count}");
     }
 
     void EmptyTexts()
