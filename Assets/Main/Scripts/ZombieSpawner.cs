@@ -34,18 +34,22 @@ public class ZombieSpawner : MonoBehaviourPun
             for (int i = 0; i < amount; i++)
             {
                 Transform spawnPoint = normalSpawnPoints[i % normalSpawnPoints.Length];
-                GameObject go = PhotonNetwork.Instantiate(zombiePrefab.name, spawnPoint.position, Quaternion.identity);
-                if (go.TryGetComponent(out ZombieController zombieCtrl))
+
+                if (PhotonNetwork.IsMasterClient)   // doble chequeo para que al salir un player no se destruyan los prefab instanciados
                 {
-                    // Asigna los waypoints que son hijos del contenedor de waypoints
-                    Transform[] waypoints = new Transform[spawnPoint.childCount];
-                    for (int j = 0; j < spawnPoint.childCount; j++)
-                        waypoints[j] = spawnPoint.GetChild(j);
+                    GameObject go = PhotonNetwork.Instantiate(zombiePrefab.name, spawnPoint.position, Quaternion.identity);
+                    if (go.TryGetComponent(out ZombieController zombieCtrl))
+                    {
+                        // Asigna los waypoints que son hijos del contenedor de waypoints
+                        Transform[] waypoints = new Transform[spawnPoint.childCount];
+                        for (int j = 0; j < spawnPoint.childCount; j++)
+                            waypoints[j] = spawnPoint.GetChild(j);
 
-                    zombieCtrl.SetPatrolWaypoints(waypoints);
-                    zombieCtrl.EnablePatrol();
+                        zombieCtrl.SetPatrolWaypoints(waypoints);
+                        zombieCtrl.EnablePatrol();
 
-                    isBossByID[go.GetComponent<PhotonView>().ViewID] = false;
+                        isBossByID[go.GetComponent<PhotonView>().ViewID] = false;
+                    }
                 }
             }
         }
@@ -54,16 +58,19 @@ public class ZombieSpawner : MonoBehaviourPun
             for (int i = 0; i < amount; i++)
             {
                 Transform spawnPoint = bossSpawnPoints[i % bossSpawnPoints.Length];
-                GameObject go = PhotonNetwork.Instantiate(bossPrefab.name, spawnPoint.position, Quaternion.identity);
-                if (go.TryGetComponent(out ZombieController bossCtrl))
+                if (PhotonNetwork.IsMasterClient) // lo mismo aca
                 {
-                    Transform[] waypoints = new Transform[spawnPoint.childCount];
-                    for (int j = 0; j < spawnPoint.childCount; j++)
-                        waypoints[j] = spawnPoint.GetChild(j);
+                    GameObject go = PhotonNetwork.Instantiate(bossPrefab.name, spawnPoint.position, Quaternion.identity);
+                    if (go.TryGetComponent(out ZombieController bossCtrl))
+                    {
+                        Transform[] waypoints = new Transform[spawnPoint.childCount];
+                        for (int j = 0; j < spawnPoint.childCount; j++)
+                            waypoints[j] = spawnPoint.GetChild(j);
 
-                    bossCtrl.SetPatrolWaypoints(waypoints);
-                    if (waypoints.Length > 0) bossCtrl.EnablePatrol(); // patrulla solo si tiene hijos
-                    isBossByID[go.GetComponent<PhotonView>().ViewID] = true;
+                        bossCtrl.SetPatrolWaypoints(waypoints);
+                        if (waypoints.Length > 0) bossCtrl.EnablePatrol(); // patrulla solo si tiene hijos
+                        isBossByID[go.GetComponent<PhotonView>().ViewID] = true;
+                    }
                 }
             }
         }
