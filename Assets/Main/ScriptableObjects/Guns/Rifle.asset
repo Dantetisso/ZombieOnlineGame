@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <_gunImage>k__BackingField: {fileID: 21300000, guid: d47d3927b348cb641a09445a372ac6a9, type: 3}
   <_gunType>k__BackingField: 1
-  <_damage>k__BackingField: 5
+  <_damage>k__BackingField: 8
   <_range>k__BackingField: 8
   <_IsAutomatic>k__BackingField: 1
   <_fireFate>k__BackingField: 0.15

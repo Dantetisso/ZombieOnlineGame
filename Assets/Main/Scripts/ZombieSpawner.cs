@@ -37,7 +37,7 @@ public class ZombieSpawner : MonoBehaviourPun
                 GameObject go = PhotonNetwork.Instantiate(zombiePrefab.name, spawnPoint.position, Quaternion.identity);
                 if (go.TryGetComponent(out ZombieController zombieCtrl))
                 {
-                    // Asignar waypoints hijos
+                    // Asigna los waypoints que son hijos del contenedor de waypoints
                     Transform[] waypoints = new Transform[spawnPoint.childCount];
                     for (int j = 0; j < spawnPoint.childCount; j++)
                         waypoints[j] = spawnPoint.GetChild(j);

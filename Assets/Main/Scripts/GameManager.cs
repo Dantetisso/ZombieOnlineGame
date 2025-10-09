@@ -158,7 +158,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RPC_ActivateBossWarning(bool isBossWave)
     {
-        // Sincronizamos el estado del GameObject para que se encienda o apague en todos los clientes
+        // sincroniza el mensaje de warning del boss
         lvlUI.SetBossWarningActive(isBossWave);
     }
 }

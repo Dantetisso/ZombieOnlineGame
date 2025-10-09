@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f8c59f8f025ecb4bb311de2cd0d1ccd, type: 3}
   m_Name: Boss
   m_EditorClassIdentifier: 
-  <_health>k__BackingField: 50
+  <_health>k__BackingField: 100
   <_damage>k__BackingField: 12
   <_viewRange>k__BackingField: 6
   <_speed>k__BackingField: 2

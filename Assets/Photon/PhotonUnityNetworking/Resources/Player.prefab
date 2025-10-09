@@ -599,8 +599,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1274595487356053930}
   - {fileID: 2222520356524320817}
+  - {fileID: 1274595487356053930}
   - {fileID: 1029689997456785268}
   m_Father: {fileID: 8580369897108245789}
   m_RootOrder: 4
@@ -1371,14 +1371,14 @@ GameObject:
   - component: {fileID: 1274595487356053930}
   - component: {fileID: 2381353699691841721}
   - component: {fileID: 4160409912893432161}
-  - component: {fileID: 2408582919850156531}
+  - component: {fileID: 8741305777844690909}
   m_Layer: 6
   m_Name: Pistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1274595487356053930
 Transform:
   m_ObjectHideFlags: 0
@@ -1394,7 +1394,7 @@ Transform:
   - {fileID: 4998024142885506907}
   - {fileID: 2066318771523318688}
   m_Father: {fileID: 1921796193824782558}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2381353699691841721
 SpriteRenderer:
@@ -1544,7 +1544,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &2408582919850156531
+--- !u!114 &8741305777844690909
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1553,7 +1553,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4189600815721422516}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2079cbff0259bfe4294de64a5de14f31, type: 3}
+  m_Script: {fileID: 11500000, guid: 3da5e41f0c461b1419f23116457ff8e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gunData: {fileID: 11400000, guid: bd748b6c140214342bc8e7ab66c999e2, type: 2}
@@ -2235,7 +2235,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2222520356524320817
 Transform:
   m_ObjectHideFlags: 0
@@ -2251,7 +2251,7 @@ Transform:
   - {fileID: 6579256980449459696}
   - {fileID: 6872448201791700060}
   m_Father: {fileID: 1921796193824782558}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4633445693223817294
 SpriteRenderer:
@@ -3201,8 +3201,8 @@ MonoBehaviour:
   interactPoint: {fileID: 7870259376703249029}
   cameraFollow: {fileID: 0}
   guns:
-  - {fileID: 2408582919850156531}
   - {fileID: 3648597562899553063}
+  - {fileID: 8741305777844690909}
   - {fileID: 8306996135003059314}
   localHUD: {fileID: 8260476522810903657}
   netWorkHUD: {fileID: 2106305805718525421}

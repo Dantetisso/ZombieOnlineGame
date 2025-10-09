@@ -8,7 +8,7 @@ public enum GunEnum
 {
     Pistol,
     AutomaticRifle,
-    Rifle,
+    Sniper,
     Shotgun
 }
 
