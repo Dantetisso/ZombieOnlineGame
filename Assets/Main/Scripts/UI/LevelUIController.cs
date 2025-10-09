@@ -6,7 +6,7 @@ public class LevelUIController : MonoBehaviour // maneja UI del nivel
     [SerializeField] private TMP_Text waveText;
     [SerializeField] private TMP_Text zombieCountText;
     [SerializeField] private TMP_Text playersAliveText;
-    [SerializeField] private GameObject bossWarningObject;  
+    [SerializeField] private GameObject bossWarningTextObject;  
     [SerializeField] private GameManager gameManager;
 
     private void OnEnable()
@@ -17,14 +17,6 @@ public class LevelUIController : MonoBehaviour // maneja UI del nivel
         GameManager.OnVictory += HandleVictory;
     }
 
-    private void OnDisable()
-    {
-        GameManager.OnAlivePlayersChanged -= UpdateAlivePlayers;
-        GameManager.OnZombiesAliveChanged -= UpdateAliveCount;
-        GameManager.OnWaveStarted -= HandleWaveStarted;
-        GameManager.OnVictory -= HandleVictory;
-    }
-
     private void Start()
     {
         if (gameManager != null && gameManager.CurrentWave > 0)
@@ -33,8 +25,7 @@ public class LevelUIController : MonoBehaviour // maneja UI del nivel
             zombieCountText.text = "Zombies: " + gameManager.ZombiesAlive;
         }
 
-        // Asegurarnos de que el GameObject esté apagado al principio
-        bossWarningObject.SetActive(false);
+        bossWarningTextObject.SetActive(false);
     }
 
     private void HandleWaveStarted(int wave, int amount, bool bossWave)
@@ -42,8 +33,7 @@ public class LevelUIController : MonoBehaviour // maneja UI del nivel
         waveText.text = "Round: " + wave;
         zombieCountText.text = "Zombies: " + amount;
 
-        // Ya no mostramos un mensaje de texto, solo activamos el GameObject cuando es ronda de boss
-        SetBossWarningActive(bossWave);
+        SetBossWarningActive(bossWave); // si es la ronda del boss muestra el texto del warning
     }
 
     private void HandleVictory()
@@ -62,9 +52,16 @@ public class LevelUIController : MonoBehaviour // maneja UI del nivel
         playersAliveText.text = "Players Alive: " + count;
     }
 
-    // Nuevo método para activar/desactivar el GameObject de advertencia del boss
     public void SetBossWarningActive(bool isActive)
     {
-        bossWarningObject.SetActive(isActive);  // Activa o desactiva el GameObject
+        bossWarningTextObject.SetActive(isActive);
+    }
+    
+    private void OnDisable()
+    {
+        GameManager.OnAlivePlayersChanged -= UpdateAlivePlayers;
+        GameManager.OnZombiesAliveChanged -= UpdateAliveCount;
+        GameManager.OnWaveStarted -= HandleWaveStarted;
+        GameManager.OnVictory -= HandleVictory;
     }
 }
