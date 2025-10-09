@@ -3,6 +3,7 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 using System;
+using UnityEngine.UIElements;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 {
@@ -28,6 +29,19 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [SerializeField] private Transform interactPoint;
     [SerializeField] private CameraWork cameraFollow;
     [SerializeField] private Gun[] guns;
+
+    [Header("MeleeAttack")]
+    [SerializeField] private GameObject attackFeedback;
+    [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private float attackRange;
+    [SerializeField] private int attackDamage;
+    [SerializeField] private float attackDuration;
+    [SerializeField] private float attackCooldown;
+    private float attackTimer;
+    private float nextAttackTime;
+    private bool IsAttacking;
+    
     private Gun activeGun;
     private HealthScript health;
     private Camera mainCamera;
@@ -38,10 +52,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [SerializeField] private TMP_Text playerNameText;
 
     public event Action<Gun> OnChangeGun;
-    
-#endregion
 
-#region Metodos
+    #endregion
+
+    #region Metodos
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -76,6 +90,16 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
             Look();
             ChangeGuns();
             HandleInput();
+
+            if (IsAttacking)
+            {
+                attackTimer -= Time.deltaTime;
+                if (attackTimer <=0)
+                {
+                    attackFeedback.SetActive(false);
+                    IsAttacking = false;
+                }
+            }
         }
     }
 
@@ -172,12 +196,17 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         if (Input.GetKeyDown(KeyCode.Escape))   // sale del juego
         {
             Application.Quit();     
-        }   
+        }
 
         if (Input.GetKeyDown(KeyCode.P))    // sale de la room
         {
-            RoomLeaver.Instance.LeaveRoom();    
-        }   
+            RoomLeaver.Instance.LeaveRoom();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.V)) 
+        {
+            MeleeAttack(); 
+        }
     }
 
     void ChangeGuns()
@@ -265,6 +294,27 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         }
     }
 
+    private void MeleeAttack()
+    {
+        if (Time.time < nextAttackTime) return;
+
+        // Feedback visual
+        attackFeedback.SetActive(true);
+        IsAttacking = true;
+        attackTimer = attackDuration;
+
+        Collider2D coll = Physics2D.OverlapBox(attackPoint.position, new Vector2(attackRange, attackRange), 0f, enemyLayer);
+
+        if (coll != null)
+        {
+            coll.gameObject.TryGetComponent(out IDamageable damageable);
+            damageable.TakeDamage(attackDamage);
+            
+        }
+
+        nextAttackTime = Time.time + attackCooldown;
+    }
+
     public void GetDamage(int damage)
     {
         health.TakeDamage(damage);
@@ -283,5 +333,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     {
         playerNameText.text = playerName;
     }
-#endregion
+    #endregion
+
+    #region Gizmos
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(attackPoint.position, new Vector3(attackRange, attackRange, 0));
+    }
+    #endregion
 }

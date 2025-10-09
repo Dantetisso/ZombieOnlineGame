@@ -92,11 +92,11 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
         if (CurrentAmmo > 0)
         {
             Shoot();
-            Debug.Log("<Color=yellow>" + name + "</color> dispara");
+       //   Debug.Log("<Color=yellow>" + name + "</color> dispara");
         }
         else
         {
-            // Cooldown para el sonido de emptyshoot
+            // Cooldown para el sonido cuando dispara sin balas
             if (Time.time >= nextEmptyClickTime)
             {
                 PlayEmptyShootSound();
@@ -108,9 +108,9 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
 
     public virtual void Shoot()
     {
-        if (IsReloading) return;
+        if (IsReloading) return;    // si esta recargando no hace nada
 
-        if (Time.time < nextFireTime) return;       // Cadencia de fuego
+        if (Time.time < nextFireTime) return;       // va disparando de acuerdo a la Cadencia de fuego
 
         CurrentAmmo--;
         NotifyAmmoChange();
