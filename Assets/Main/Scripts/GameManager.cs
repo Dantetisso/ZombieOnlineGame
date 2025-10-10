@@ -52,13 +52,13 @@ public class GameManager : MonoBehaviourPunCallbacks
     public override void OnEnable()
     {
         base.OnEnable();
-        HealthScript.OnPlayerDied += HandlePlayerDied;
+        PlayerMovement.OnPlayerDied += HandlePlayerDied;
     }
 
     public override void OnDisable()
     {
         base.OnDisable();
-        HealthScript.OnPlayerDied -= HandlePlayerDied;
+        PlayerMovement.OnPlayerDied -= HandlePlayerDied;
     }
 
     private void ReadConfig()
@@ -116,11 +116,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void HandlePlayerDied(Player player)
+    private void HandlePlayerDied(int viewID)
     {
-        if (deadPlayersIDs.Contains(player.ActorNumber)) return;
+        if (deadPlayersIDs.Contains(viewID)) return;
 
-        deadPlayersIDs.Add(player.ActorNumber);
+        deadPlayersIDs.Add(viewID);
         deadPlayers++;
 
         int alivePlayers = PhotonNetwork.CurrentRoom.PlayerCount - deadPlayers;
@@ -139,8 +139,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RPC_Victory()
     {
-        if (PhotonNetwork.IsMasterClient)
-            SceneLoader.LoadSceneByPhoton(ScenesEnum.Victory);
+        if (PhotonNetwork.IsMasterClient) SceneLoader.LoadSceneByPhoton(ScenesEnum.Victory);
     }
 
     [PunRPC]

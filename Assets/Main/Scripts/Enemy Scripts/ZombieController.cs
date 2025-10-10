@@ -8,7 +8,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     [Header("References")]
     public EnemyStats enemyStats; // público para acceso desde spawner
     NavMeshAgent navAgent; // público para acceso desde spawner
-    HealthScript health;
+    HealthScript healthScript;
     LineOfSightMono lineOfSight;
 
     [Header("Patrol Settings")]
@@ -25,7 +25,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     private void Awake()
     {
         navAgent = GetComponent<NavMeshAgent>();
-        health = GetComponent<HealthScript>();
+        healthScript = GetComponent<HealthScript>();
         lineOfSight = GetComponent<LineOfSightMono>();
 
         navAgent.updateRotation = false;
@@ -36,7 +36,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     {
         navAgent.speed = enemyStats._speed;
         lineOfSight.range = enemyStats._viewRange;
-        health.InitHealth(enemyStats._health);
+        healthScript.InitHealth(enemyStats._health);
 
         allPlayers = FindObjectsOfType<PlayerMovement>();
 
@@ -217,9 +217,28 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
 
     public void TakeDamage(int damage)
     {
-        health.TakeDamage(damage);
+        healthScript.GetDamage(damage);
+        if (healthScript._currentHealth <= 0)
+        {
+            Die();
+        }
     }
 
+    public void Die()
+    {
+        photonView.RPC(nameof(RPC_ZombieDied), RpcTarget.MasterClient, photonView.ViewID);
+        Debug.Log("mori");
+    }
+
+    [PunRPC]
+    private void RPC_ZombieDied(int viewID)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            FindObjectOfType<ZombieSpawner>().OnZombieDied(viewID);
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

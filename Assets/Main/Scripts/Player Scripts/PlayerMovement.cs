@@ -4,8 +4,9 @@ using Photon.Pun;
 using TMPro;
 using System;
 using UnityEngine.UIElements;
+using Photon.Realtime;
 
-public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
+public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 {
     #region  Variables
     [Header("Movement")]
@@ -14,6 +15,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     private float vertical;
     private Vector2 dir;
 
+    
     [Header("Evade")]
     [SerializeField] private int maxEvades;  // Máximo de cargas de esquive
     [SerializeField, Range(5, 20)] private float evadeForce;
@@ -43,7 +45,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     private bool IsAttacking;
 
     private Gun activeGun;
-    private HealthScript health;
+    private HealthScript healthScript;
     private Camera mainCamera;
 
     [Header("UI")]
@@ -52,13 +54,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
     [SerializeField] private TMP_Text playerNameText;
 
     public event Action<Gun> OnChangeGun;
+    public static event Action<int> OnPlayerDied;
     #endregion
 
     #region Metodos
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        health = GetComponent<HealthScript>();
+        healthScript = GetComponent<HealthScript>();
 
         currentEvades = maxEvades;
         mainCamera = Camera.main;
@@ -295,7 +298,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
 
     public void GetDamage(int damage)
     {
-        health.TakeDamage(damage);
+        healthScript.GetDamage(damage);
     }
     #endregion
 
@@ -336,6 +339,25 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         attackFeedback.SetActive(false);
     }
     #endregion
+    public void TakeDamage(int damage)
+    {
+        healthScript.GetDamage(damage);
+        if (healthScript._currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    public void Die()
+    {
+      photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered, photonView.ViewID);
+    }
+
+    [PunRPC]
+    private void RPC_PlayerDied(int ID)
+    {
+        OnPlayerDied?.Invoke(ID);
+    }
 
     #region Gizmos
     void OnDrawGizmos()
@@ -343,5 +365,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPlayer
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(attackPoint.position, new Vector3(attackRange, attackRange, 0));
     }
+    
     #endregion
 }

@@ -5,16 +5,14 @@ using Photon.Pun;
 using UnityEngine;
 
 [RequireComponent(typeof(PhotonView))]
-public class HealthScript : MonoBehaviourPun, IDamageable
+public class HealthScript : MonoBehaviourPun
 {
     [Header("Health")]
     public int maxHealth;
-    [SerializeField] private int currentHealth;
+    private int currentHealth;
     public int _currentHealth => currentHealth;
-    [SerializeField] private bool IsPlayer;
 
     public event Action<int, int> OnHealthChanged;
-    public static event Action<Player> OnPlayerDied;
 
     private Renderer _renderer;
     private Color _originalColor;
@@ -34,7 +32,7 @@ public class HealthScript : MonoBehaviourPun, IDamageable
             photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.All, currentHealth, maxHealth);
     }
 
-    public void TakeDamage(int damage)
+    public void GetDamage(int damage)
     {
         if (!photonView.IsMine || isDead) return;
 
@@ -47,7 +45,6 @@ public class HealthScript : MonoBehaviourPun, IDamageable
         if (currentHealth <= 0 && !isDead)
         {
             isDead = true;
-            HandleDeath();
         }
     }
 
@@ -78,14 +75,6 @@ public class HealthScript : MonoBehaviourPun, IDamageable
 
     public bool IsAlive() => !isDead && currentHealth > 0;
 
-    private void HandleDeath()
-    {
-        if (IsPlayer)
-            photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered);
-        else
-            photonView.RPC(nameof(RPC_ZombieDied), RpcTarget.MasterClient, photonView.ViewID);
-    }
-
     [PunRPC]
     private void RPC_DamageFeedback()
     {
@@ -100,24 +89,4 @@ public class HealthScript : MonoBehaviourPun, IDamageable
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
-    [PunRPC]
-    private void RPC_PlayerDied()
-    {
-        OnPlayerDied?.Invoke(photonView.Owner);
-    }
-
-    [PunRPC]
-    private void RPC_ZombieDied(int viewID)
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            FindObjectOfType<ZombieSpawner>().OnZombieDied(viewID);
-            PhotonNetwork.Destroy(gameObject);
-        }
-    }
-
-    public void GetDamage(int damage)
-    {
-        TakeDamage(damage);
-    }
 }

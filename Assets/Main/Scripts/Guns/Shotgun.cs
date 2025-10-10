@@ -50,7 +50,7 @@ public class Shotgun : Gun
                 {
                     if (hit.collider.TryGetComponent(out HealthScript enemyHealth))
                     {
-                        enemyHealth.TakeDamage((int)damagePerPellet);
+                        enemyHealth.GetDamage((int)damagePerPellet);
                     }
                 }
             }
