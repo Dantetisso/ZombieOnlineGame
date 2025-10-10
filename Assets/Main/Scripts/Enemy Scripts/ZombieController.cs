@@ -227,7 +227,6 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     public void Die()
     {
         photonView.RPC(nameof(RPC_ZombieDied), RpcTarget.MasterClient, photonView.ViewID);
-        Debug.Log("mori");
     }
 
     [PunRPC]

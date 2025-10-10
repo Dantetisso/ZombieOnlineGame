@@ -74,7 +74,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
                 // y chequeo si el objeto sigue existiendo
                 if (self == null || self.gameObject == null) return;
 
-                Debug.Log("Conectado al servidor. Mostrando rooms...");
+                Debug.Log("Connected to server, showing rooms");
                 PhotonNetwork.JoinLobby();
                 self.connectPanel.SetActive(false);
                 self.joinPanel.SetActive(true);
