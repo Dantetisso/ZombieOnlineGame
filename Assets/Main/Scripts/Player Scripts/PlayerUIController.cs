@@ -6,7 +6,6 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
 {
     [SerializeField] private Image healthBar;
     [SerializeField] private Image evadeBar;
-    [SerializeField] private Image ammoBar;
     [SerializeField] private Image gunImage;
     [SerializeField] private TMP_Text ammoClipText;
     [SerializeField] private TMP_Text ammoReserveText;
@@ -99,7 +98,5 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
     {
         ammoClipText.text = clip.ToString();
         ammoReserveText.text = reserve.ToString();
-
-        ammoBar.fillAmount = (float)clip / myGun.fullAmmoClip;
     }
 }
