@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class LeaderboardUI : MonoBehaviour
 {
-    [SerializeField] string leaderboardKey = "global_highscore";
+    [SerializeField] const string leaderboardKey = "kill_highscore";
     [SerializeField] int count = 10;
     [SerializeField] TMPro.TextMeshProUGUI tableText;
 

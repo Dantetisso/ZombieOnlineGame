@@ -1,9 +1,9 @@
 ﻿<Solution>
   <Project Path="PhotonVoice.API.csproj" />
   <Project Path="PhotonVoice.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="NavMeshPlus.csproj" />
   <Project Path="PhotonRealtime.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="PhotonUnityNetworking.csproj" />
   <Project Path="PhotonUnityNetworking.Utilities.csproj" />
   <Project Path="PhotonChat.csproj" />
