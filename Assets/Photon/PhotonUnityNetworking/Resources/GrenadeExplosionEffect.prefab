@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 6087592858624553619}
   - component: {fileID: 319328184852655322}
   - component: {fileID: 8536083571337454000}
+  - component: {fileID: -5530997340666854867}
   m_Layer: 0
-  m_Name: Impact02
+  m_Name: GrenadeExplosionEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5038,3 +5039,16 @@ MonoBehaviour:
     InterpolateOption: 0
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 0
+--- !u!114 &-5530997340666854867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6192724089161036641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1316151f3cbabf4a827ccbd5a1c62cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destructionDelay: 1.1
