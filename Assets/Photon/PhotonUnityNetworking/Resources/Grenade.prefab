@@ -292,10 +292,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explosionDelay: 1.2
-  explosionEffect: {fileID: 6776222497751725399, guid: 94747e4158dc2b6478f4c101d1cfde98, type: 3}
+  explosionEffect: {fileID: 6192724089161036641, guid: e17d9a3f04750764c8c0a7a0461e4c3b, type: 3}
   enemyLayer:
     serializedVersion: 2
     m_Bits: 256
   grenadeDamage: 20
   grenadeRange: 8
-  explosionSound: {fileID: 0}
