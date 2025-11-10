@@ -74,6 +74,8 @@ MonoBehaviour:
   - RPC_ActivateBossWarning
   - RPC_MeleeAttack
   - RPC_PlayAttackFeedback
+  - RPC_GrenadeAttack
+  - RPC_GrenadeSound
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

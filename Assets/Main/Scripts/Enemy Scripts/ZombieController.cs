@@ -10,6 +10,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     NavMeshAgent navAgent; // público para acceso desde spawner
     HealthScript healthScript;
     LineOfSightMono lineOfSight;
+    private Animator anim;
 
     [Header("Patrol Settings")]
     private Transform[] patrolWaypoints;
@@ -27,6 +28,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         navAgent = GetComponent<NavMeshAgent>();
         healthScript = GetComponent<HealthScript>();
         lineOfSight = GetComponent<LineOfSightMono>();
+        anim = GetComponent<Animator>();
 
         navAgent.updateRotation = false;
         navAgent.updateUpAxis = false;
@@ -67,6 +69,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     #region Patrol
     private void PatrolBehavior()
     {
+        anim.SetBool("IsWalking", true);
         Transform targetPlayer = DetectPlayerInLOS();
         if (targetPlayer != null)
         {
@@ -113,6 +116,8 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     #region Attack
     private void AttackBehavior()
     {
+        anim.SetBool("IsWalking", false);
+        
         Collider2D[] playersInRange = Physics2D.OverlapCircleAll(
             transform.position,
             enemyStats._attackRange,

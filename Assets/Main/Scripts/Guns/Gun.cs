@@ -136,9 +136,9 @@ public abstract class Gun : MonoBehaviourPunCallbacks, IGun
             }
             else
             {
-                if (hit.collider.TryGetComponent(out HealthScript enemyHealth))
+                if (hit.collider.TryGetComponent(out IDamageable damageable))
                 {
-                    enemyHealth.GetDamage(gunData._damage);
+                    damageable.TakeDamage(gunData._damage);
                 }
             }
         }

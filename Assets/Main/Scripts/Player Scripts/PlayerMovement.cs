@@ -3,8 +3,6 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 using System;
-using UnityEngine.UIElements;
-using Photon.Realtime;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 {
@@ -43,6 +41,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     private float attackTimer;
     private float nextAttackTime;
     private bool IsAttacking;
+
+    [Header("Grenade")]
+    [SerializeField] private GameObject grenadeObject;
+    [SerializeField] private Transform grenadePos;
+    [SerializeField] private float grenadeThrowForce;
+    private int grenadeCount;
+    private bool IsThrowing;
 
     private Gun activeGun;
     private HealthScript healthScript;
@@ -186,6 +191,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         if (Input.GetKeyDown(KeyCode.P)) RoomLeaver.Instance.LeaveRoom();
 
         if (Input.GetKeyDown(KeyCode.V)) MeleeAttack();
+
+        if (Input.GetKeyDown(KeyCode.G)) Grenade();
     }
 
     void ChangeGuns()
@@ -222,6 +229,23 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
                 ui?.InitGun(activeGun);
             }
         }
+    }
+
+    void Grenade()
+    {
+        // Crear la granada en la posición del jugador
+        GameObject grenade = PhotonNetwork.Instantiate(grenadeObject.name, grenadePos.position, Quaternion.identity);
+
+        // Obtener el Rigidbody2D
+        Rigidbody2D grenadeRb = grenade.GetComponent<Rigidbody2D>();
+        if (grenadeRb == null) return;
+
+        // Calcular la dirección hacia el mouse
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 throwDir = (mouseWorldPos - grenadePos.position).normalized;
+
+        // Aplicar fuerza a la granada
+        grenadeRb.AddForce(throwDir * grenadeThrowForce, ForceMode2D.Impulse);
     }
 
     IEnumerator EndEvade()

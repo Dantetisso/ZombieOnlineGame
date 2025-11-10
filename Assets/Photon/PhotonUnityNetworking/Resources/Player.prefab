@@ -120,7 +120,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBar: {fileID: 5677844601477470235}
   evadeBar: {fileID: 8645626169925822030}
-  ammoBar: {fileID: 0}
   gunImage: {fileID: 2700481231482469538}
   ammoClipText: {fileID: 8966502359511864716}
   ammoReserveText: {fileID: 4672133576683680437}
@@ -604,7 +603,7 @@ Transform:
   - {fileID: 1274595487356053930}
   - {fileID: 1029689997456785268}
   m_Father: {fileID: 8580369897108245789}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2106305805718525421
 GameObject:
@@ -636,7 +635,7 @@ Transform:
   m_Children:
   - {fileID: 7533337606336864461}
   m_Father: {fileID: 8580369897108245789}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2113413368388381013
 GameObject:
@@ -932,7 +931,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8580369897108245789}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3486615110250966290
 GameObject:
@@ -1224,7 +1223,7 @@ GameObject:
   - component: {fileID: 5801533570625356730}
   - component: {fileID: 7246675910922933867}
   m_Layer: 6
-  m_Name: Isometric Diamond
+  m_Name: MeleeFeedback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1243,7 +1242,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8580369897108245789}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7246675910922933867
 SpriteRenderer:
@@ -1854,7 +1853,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8580369897108245789}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5378613206471169935
 GameObject:
@@ -2189,7 +2188,7 @@ RectTransform:
   m_Children:
   - {fileID: 7039351461039011764}
   m_Father: {fileID: 8580369897108245789}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2460,6 +2459,37 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   muzzleFlash: {fileID: 7603190064661154718}
+--- !u!1 &6900236995365055743
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 358390568248333725}
+  m_Layer: 6
+  m_Name: GrenadePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &358390568248333725
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6900236995365055743}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8580369897108245789}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7017117009761320811
 GameObject:
   m_ObjectHideFlags: 0
@@ -2865,7 +2895,7 @@ Transform:
   - {fileID: 3440980939338557934}
   - {fileID: 4217762006274947259}
   m_Father: {fileID: 8580369897108245789}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8797775804549152414
 GameObject:
@@ -2980,6 +3010,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 358390568248333725}
   - {fileID: 5801533570625356730}
   - {fileID: 5222014947830329443}
   - {fileID: 584795482322472398}
@@ -3180,6 +3211,9 @@ MonoBehaviour:
   attackDamage: 5
   attackDuration: 0.2
   attackCooldown: 0.8
+  grenadeObject: {fileID: 729689743093743196, guid: 63c64159883da0641883c39c1ebf9077, type: 3}
+  grenadePos: {fileID: 358390568248333725}
+  grenadeThrowForce: 10
   localHUD: {fileID: 8260476522810903657}
   netWorkHUD: {fileID: 2106305805718525421}
   playerNameText: {fileID: 7493352220643332536}
