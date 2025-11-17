@@ -296,5 +296,5 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 256
-  grenadeDamage: 20
-  grenadeRange: 10
+  grenadeDamage: 25
+  grenadeRange: 8
