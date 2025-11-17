@@ -9,6 +9,7 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
     [SerializeField] private Image gunImage;
     [SerializeField] private TMP_Text ammoClipText;
     [SerializeField] private TMP_Text ammoReserveText;
+    [SerializeField] private TMP_Text grenadeCountText;
 
     private HealthScript health;
     private PlayerMovement player;
@@ -31,6 +32,7 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
         if (player != null)
         {
             player.OnChangeGun += InitGun;
+            player.OnChangeGrenade += UpdateGrenadeText;
         }
     }
 
@@ -49,6 +51,7 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
         if (player != null)
         {
             player.OnChangeGun -= InitGun;
+            player.OnChangeGrenade -= UpdateGrenadeText;
         }
     }
 
@@ -98,5 +101,10 @@ public class PlayerUIController : MonoBehaviour // maneja UI del jugador
     {
         ammoClipText.text = clip.ToString();
         ammoReserveText.text = reserve.ToString();
+    }
+
+    private void UpdateGrenadeText(int count)
+    {
+        grenadeCountText.text = count.ToString();
     }
 }

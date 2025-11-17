@@ -45,6 +45,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     [Header("Grenade")]
     [SerializeField] private GameObject grenadeObject;
     [SerializeField] private Transform grenadePos;
+    [SerializeField] private int maxGrenadeCount;
     [SerializeField] private float grenadeThrowForce;
     private int grenadeCount;
     private bool IsThrowing;
@@ -60,6 +61,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
     public event Action<Gun> OnChangeGun;
     public static event Action<int> OnPlayerDied;
+    public event Action<int> OnChangeGrenade;
     #endregion
 
     #region Metodos
@@ -70,6 +72,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
         currentEvades = maxEvades;
         mainCamera = Camera.main;
+        grenadeCount = maxGrenadeCount;
+        OnChangeGrenade?.Invoke(grenadeCount);
 
         if (photonView.IsMine || !PhotonNetwork.IsConnected)
         {
@@ -233,19 +237,24 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
     void Grenade()
     {
-        // Crear la granada en la posición del jugador
-        GameObject grenade = PhotonNetwork.Instantiate(grenadeObject.name, grenadePos.position, Quaternion.identity);
+        if (grenadeCount > 0)
+        {
+            // Crear la granada en la posición del jugador
+            GameObject grenade = PhotonNetwork.Instantiate(grenadeObject.name, grenadePos.position, Quaternion.identity);
 
-        // Obtener el Rigidbody2D
-        Rigidbody2D grenadeRb = grenade.GetComponent<Rigidbody2D>();
-        if (grenadeRb == null) return;
+            // Obtener el Rigidbody2D
+            Rigidbody2D grenadeRb = grenade.GetComponent<Rigidbody2D>();
+            if (grenadeRb == null) return;
 
-        // Calcular la dirección hacia el mouse
-        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 throwDir = (mouseWorldPos - grenadePos.position).normalized;
+            // Calcular la dirección hacia el mouse
+            Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 throwDir = (mouseWorldPos - grenadePos.position).normalized;
 
-        // Aplicar fuerza a la granada
-        grenadeRb.AddForce(throwDir * grenadeThrowForce, ForceMode2D.Impulse);
+            // Aplicar fuerza a la granada
+            grenadeRb.AddForce(throwDir * grenadeThrowForce, ForceMode2D.Impulse);
+            grenadeCount--;
+            OnChangeGrenade?.Invoke(grenadeCount);
+        }
     }
 
     IEnumerator EndEvade()
