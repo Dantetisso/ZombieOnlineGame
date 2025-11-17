@@ -16,11 +16,13 @@ public class GameManager : MonoBehaviourPunCallbacks
     private int bossRound;
     private int currentWave;
     private int zombiesAlive;
+    private int zombiesDead;
     private int deadPlayers = 0;
     private bool isBossWave = false;
 
     public int CurrentWave => currentWave;
     public int ZombiesAlive => zombiesAlive;
+    public int ZombiesDead => zombiesDead;
 
     public static event Action<int> OnAlivePlayersChanged;
     public static event Action<int> OnZombiesAliveChanged;
@@ -100,9 +102,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (!PhotonNetwork.IsMasterClient) return;
 
         zombiesAlive--;
+        zombiesDead++;
         OnZombiesAliveChanged?.Invoke(zombiesAlive);
 
         photonView.RPC(nameof(RPC_UpdateZombiesAlive), RpcTarget.Others, zombiesAlive);
+        LeaderboardService.SubmitScore(zombiesDead, "kill_highscore"); // al morir los zombis se suma el score
 
         if (isBossWave)
         {

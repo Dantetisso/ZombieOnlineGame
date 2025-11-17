@@ -12,20 +12,35 @@ public class LootLockerBootstrap : MonoBehaviour
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        StartGuest();
+        StartLogin();
     }
 
-    void StartGuest()
+/*    void StartGuest()
     {
         LootLockerSDKManager.StartGuestSession(playerIdentifier, response =>
         {
             if (!response.success)
             {
-                Debug.LogError("Fallo");
+                Debug.LogError("Fallo al iniciar LOOTLOCKER");
                 return;
             }
             SessionStarted = true;
-            Debug.Log("Conectado");
+            Debug.Log("Conectado a LOOTLOCKER");
+        });
+    }*/
+
+    void StartLogin()
+    {
+        LootLockerSDKManager.StartGuestSession((response) =>
+        {
+            if (!response.success)
+            {
+                Debug.LogError("Fallo al iniciar LOOTLOCKER");
+                return;
+            }
+            SessionStarted = true;
+            Debug.Log("Conectado a LOOTLOCKER");
+            PlayerPrefs.SetString("PlayerID", response.player_id.ToString());
         });
     }
 }

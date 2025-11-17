@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class LeaderboardService : MonoBehaviour
 {
+    int leaderboardID = 32066;
+
     public static void SubmitScore(int score, string leaderboardKey, System.Action<bool> onDone = null)
     {
         LootLockerSDKManager.SubmitScore("", score, leaderboardKey, response =>
