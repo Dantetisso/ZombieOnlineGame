@@ -297,4 +297,4 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   grenadeDamage: 20
-  grenadeRange: 8
+  grenadeRange: 10

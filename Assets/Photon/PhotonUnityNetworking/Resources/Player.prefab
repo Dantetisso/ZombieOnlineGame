@@ -3464,7 +3464,7 @@ MonoBehaviour:
   attackCooldown: 0.8
   grenadeObject: {fileID: 729689743093743196, guid: 63c64159883da0641883c39c1ebf9077, type: 3}
   grenadePos: {fileID: 358390568248333725}
-  maxGrenadeCount: 3
+  maxGrenadeCount: 5
   grenadeThrowForce: 10
   localHUD: {fileID: 8260476522810903657}
   netWorkHUD: {fileID: 2106305805718525421}
