@@ -20,6 +20,8 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     [Header("AI State")]
     private EnemyStates currentState;
     private float lastAttackTime;
+    private bool IsWalking;
+    private bool IsAttacking;
 
     private PlayerMovement[] allPlayers;
 
@@ -90,6 +92,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     #region Chase
     private void ChaseBehavior()
     {
+        anim.SetBool("IsWalking", true);
         Transform targetPlayer = DetectPlayerInLOS();
         if (targetPlayer == null)
         {
@@ -109,6 +112,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         {
             navAgent.isStopped = true;
             currentState = EnemyStates.Attack;
+            anim.SetBool("IsWalking", false);
         }
     }
     #endregion
@@ -116,7 +120,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     #region Attack
     private void AttackBehavior()
     {
-        anim.SetBool("IsWalking", false);
+        anim.SetBool("IsAttacking", true);
         
         Collider2D[] playersInRange = Physics2D.OverlapCircleAll(
             transform.position,
@@ -142,6 +146,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         {
             currentState = canPatrol ? EnemyStates.Patrol : EnemyStates.Idle;
             navAgent.isStopped = false;
+            anim.SetBool("IsAttacking", false);
             return;
         }
 
