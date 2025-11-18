@@ -245,8 +245,15 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         if (PhotonNetwork.IsMasterClient)
         {
             FindObjectOfType<ZombieSpawner>().OnZombieDied(viewID);
-            PhotonNetwork.Destroy(gameObject);
+            StartCoroutine(DeathRoutine());
         }
+    }
+
+    IEnumerator DeathRoutine()
+    {
+        anim.SetBool("IsDeath",true);
+        yield return new WaitForSeconds(1);
+        PhotonNetwork.Destroy(gameObject);
     }
     private void OnDrawGizmosSelected()
     {
