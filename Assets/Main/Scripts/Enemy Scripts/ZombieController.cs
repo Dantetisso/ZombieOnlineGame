@@ -228,6 +228,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     public void TakeDamage(int damage)
     {
         healthScript.GetDamage(damage);
+
         if (healthScript._currentHealth <= 0)
         {
             Die();
