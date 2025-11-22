@@ -328,11 +328,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
         nextAttackTime = Time.time + attackCooldown;
     }
-
-    public void GetDamage(int damage)
-    {
-        healthScript.GetDamage(damage);
-    }
     #endregion
 
     #region RPCs
@@ -363,7 +358,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     {
         attackFeedback.SetActive(true);
         StartCoroutine(DisableFeedbackAfter(duration));
-
     }
 
     IEnumerator DisableFeedbackAfter(float time)
