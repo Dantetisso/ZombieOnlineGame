@@ -11,6 +11,7 @@ public class HealthScript : MonoBehaviourPun
     public int maxHealth;
     private int currentHealth;
     public int _currentHealth => currentHealth;
+    [SerializeField] private GameObject damageFeedbackObject;
 
     public event Action<int, int> OnHealthChanged;
 
@@ -53,8 +54,10 @@ public class HealthScript : MonoBehaviourPun
         if (_renderer == null) yield break;
 
         _renderer.material.color = Color.red;
+        damageFeedbackObject.SetActive(true);
         yield return new WaitForSeconds(0.2f);
         _renderer.material.color = _originalColor;
+        damageFeedbackObject.SetActive(false);
     }
 
     public void InitHealth(int health)
