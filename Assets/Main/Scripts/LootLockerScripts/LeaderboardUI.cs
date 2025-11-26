@@ -52,7 +52,7 @@ public class LeaderboardUI : MonoBehaviour
     {
         if (int.TryParse(scoreInput.text, out var score))
         {
-            LeaderboardService.SubmitScore(score, leaderboardKey, _ => Refresh());
+            LeaderboardService.AddScore(score, leaderboardKey, _ => Refresh());
         }
     }
 

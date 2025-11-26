@@ -1,25 +1,47 @@
 using LootLocker.Requests;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LeaderboardService : MonoBehaviour
 {
-    int leaderboardID = 32066;
+    public static int leaderboardID = 32066;
 
-    public static void SubmitScore(int score, string leaderboardKey, System.Action<bool> onDone = null)
+    /// <summary>
+    /// Suma score al total del usuario en el leaderboard.
+    /// </summary>
+    public static void AddScore(int addedScore, string leaderboardKey, System.Action<bool> onDone = null)
     {
-        LootLockerSDKManager.SubmitScore("", score, leaderboardKey, response =>
+        string playerID = PlayerPrefs.GetString("PlayerID", "");
+        if (string.IsNullOrEmpty(playerID))
+        {
+            Debug.LogError("PlayerID no encontrado, no se puede enviar score.");
+            return;
+        }
+
+        // Primero obtener el score actual del jugador
+        LootLockerSDKManager.GetMemberRank(leaderboardKey, playerID, (response) =>
         {
             if (!response.success)
             {
-                Debug.LogError("Fallo el score");
-                onDone?.Invoke(false);
-
+                Debug.LogError("Error al obtener score actual.");
                 return;
             }
-            Debug.Log("Se envio el score");
-            onDone?.Invoke(true);
+
+            int currentScore = response.score;
+            int newScore = currentScore + addedScore;
+
+            Debug.Log($"Score actual: {currentScore}, agregar: {addedScore}, total nuevo: {newScore}");
+
+            // Subir el nuevo total
+            LootLockerSDKManager.SubmitScore(playerID, newScore, leaderboardKey, (submitResponse) =>
+            {
+                if (!submitResponse.success)
+                {
+                    Debug.LogError("No se pudo subir el score acumulado.");
+                    return;
+                }
+
+                Debug.Log("Score acumulado actualizado correctamente: " + newScore);
+            });
         });
     }
 }
