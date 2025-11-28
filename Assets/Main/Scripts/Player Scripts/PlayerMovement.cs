@@ -53,6 +53,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     private Gun activeGun;
     private HealthScript healthScript;
     private Camera mainCamera;
+    Animator anim;
 
     [Header("UI")]
     [SerializeField] private GameObject localHUD;
@@ -69,6 +70,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     {
         rb = GetComponent<Rigidbody2D>();
         healthScript = GetComponent<HealthScript>();
+        anim = GetComponent<Animator>();
 
         currentEvades = maxEvades;
         mainCamera = Camera.main;
@@ -175,6 +177,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         if (rb.velocity != Vector2.zero)
         {
             isEvading = true;
+            anim.SetBool("IsEvading", isEvading);
             currentEvades--;
             rb.velocity = Vector2.zero;
             rb.AddForce(dir.normalized * evadeForce, ForceMode2D.Impulse);
@@ -262,6 +265,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     {
         yield return new WaitForSeconds(evadeDuration);
         isEvading = false;
+        anim.SetBool("IsEvading", isEvading);
     }
 
     IEnumerator ReloadEvade()
