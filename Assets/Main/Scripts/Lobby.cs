@@ -9,11 +9,13 @@ using UnityEngine.UI;
 public class Lobby : MonoBehaviourPunCallbacks  
 {
     [SerializeField] private Button startGameButton;
+    [SerializeField] private Button BackButton;
     [SerializeField] private TMP_Text[] playerNickNameTexts;
 
     void Start()
     {
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
+        BackButton.onClick.AddListener(OnBackButtonClicked);
         EmptyTexts();
 
        if (!PhotonNetwork.IsMasterClient) startGameButton.gameObject.SetActive(false); // solo el masterclient ve el boton de play
@@ -34,6 +36,11 @@ public class Lobby : MonoBehaviourPunCallbacks
         {
             SceneLoader.LoadScene(ScenesEnum.Level); 
         }
+    }
+
+    void OnBackButtonClicked()
+    {
+        RoomLeaver.Instance.LeaveRoom();
     }
 
     private void SafeUpdateTexts()
@@ -60,13 +67,22 @@ public class Lobby : MonoBehaviourPunCallbacks
             }
         }
 
-    //  startGameButton.interactable = orderedPlayers.Count >= 2 && orderedPlayers.Count <= 4;        // el boton se prende si esta la cantidad de jugadores
-//        Debug.Log($"[Lobby] Jugadores en la sala: {orderedPlayers.Count}");
+        startGameButton.interactable = orderedPlayers.Count >= 2 && orderedPlayers.Count <= 4;        // el boton se prende si esta la cantidad de jugadores
+        //    Debug.Log($"[Lobby] Jugadores en la sala: {orderedPlayers.Count}");
     }
 
     void EmptyTexts()
     {
         for (int i = 0; i < playerNickNameTexts.Length; i++) playerNickNameTexts[i].text = "";
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        // Si el jugador local ahora es Master, activa el botón
+        if (PhotonNetwork.LocalPlayer == newMasterClient)
+        {
+            startGameButton.gameObject.SetActive(true);
+        }
     }
 
     void OnDestroy()
