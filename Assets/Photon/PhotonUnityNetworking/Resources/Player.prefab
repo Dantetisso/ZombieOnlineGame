@@ -3625,10 +3625,10 @@ MonoBehaviour:
     SynchronizeType: 0
     Name: walk
   - Type: 9
-    SynchronizeType: 1
+    SynchronizeType: 0
     Name: Downed
   - Type: 9
-    SynchronizeType: 1
+    SynchronizeType: 0
     Name: Revived
   - Type: 4
     SynchronizeType: 1

@@ -7,9 +7,9 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
 {
     [Header("References")]
     public EnemyStats enemyStats; // público para acceso desde spawner
-    NavMeshAgent navAgent; // público para acceso desde spawner
-    HealthScript healthScript;
-    LineOfSightMono lineOfSight;
+    private NavMeshAgent navAgent;
+    private HealthScript healthScript;
+    private LineOfSightMono lineOfSight;
     private Animator anim;
 
     [Header("Patrol Settings")]
@@ -20,8 +20,6 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     [Header("AI State")]
     private EnemyStates currentState;
     private float lastAttackTime;
-    private bool IsWalking;
-    private bool IsAttacking;
 
     private PlayerMovement[] allPlayers;
 
@@ -124,7 +122,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     private void AttackBehavior()
     {
         anim.SetBool("IsAttacking", true);
-        
+
         Collider2D[] playersInRange = Physics2D.OverlapCircleAll(
             transform.position,
             enemyStats._attackRange,
@@ -236,7 +234,7 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     public void Die()
     {
         if (spawner == null)
-        spawner = FindObjectOfType<ZombieSpawner>(); // si el spawner es nulo lo busca
+            spawner = FindObjectOfType<ZombieSpawner>();
 
         photonView.RPC(nameof(RPC_ZombieDied), RpcTarget.MasterClient, photonView.ViewID);
     }
@@ -245,14 +243,14 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
     private void RPC_ZombieDied(int viewID)
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        
+
         spawner.OnZombieDied(viewID);
         StartCoroutine(DeathRoutine());
     }
 
     IEnumerator DeathRoutine()
     {
-        anim.SetBool("IsDeath",true);
+        anim.SetBool("IsDeath", true);
         yield return new WaitForSeconds(1);
         PhotonNetwork.Destroy(gameObject);
     }

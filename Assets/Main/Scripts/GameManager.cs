@@ -45,9 +45,24 @@ public class GameManager : MonoBehaviourPunCallbacks
             OnAlivePlayersChanged?.Invoke(alivePlayers);
         }
 
+        // Solo iniciar nueva ronda si es el primer Master
         if (PhotonNetwork.IsMasterClient)
         {
-            StartNextWave();
+            if (!PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("currentWave"))
+            {
+                StartNextWave();
+            }
+            else
+            {
+                // Recupera el estado guardado
+                currentWave = (int)PhotonNetwork.CurrentRoom.CustomProperties["currentWave"];
+                zombiesAlive = (int)PhotonNetwork.CurrentRoom.CustomProperties["zombiesAlive"];
+                isBossWave = (bool)PhotonNetwork.CurrentRoom.CustomProperties["isBossWave"];
+
+                OnWaveStarted?.Invoke(currentWave, zombiesAlive, isBossWave);
+                OnZombiesAliveChanged?.Invoke(zombiesAlive);
+                lvlUI.SetBossWarningActive(isBossWave);
+            }
         }
     }
 
@@ -83,18 +98,24 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         isBossWave = bossRound > 0 && currentWave % bossRound == 0;
 
-        // Cantidad de enemigos según si es boss o ronda normal
         int amount = isBossWave ? 1 : baseZombies + (currentWave - 1) * zombiesPerRound;
         zombiesAlive = amount;
 
-        // MasterClient actualiza UI
+        // Actualizamos Custom Properties
+        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
+        {
+            { "currentWave", currentWave },
+            { "zombiesAlive", zombiesAlive },
+            { "isBossWave", isBossWave }
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(props);
+
         OnWaveStarted?.Invoke(currentWave, amount, isBossWave);
         OnZombiesAliveChanged?.Invoke(zombiesAlive);
 
-        // Sincronizar con todos los clientes
         photonView.RPC(nameof(RPC_UpdateWaveInfo), RpcTarget.Others, currentWave, amount, isBossWave);
         photonView.RPC(nameof(RPC_UpdateZombiesAlive), RpcTarget.Others, zombiesAlive);
-        photonView.RPC(nameof(RPC_ActivateBossWarning), RpcTarget.All, isBossWave);  // Activar el GameObject en rondas de boss
+        photonView.RPC(nameof(RPC_ActivateBossWarning), RpcTarget.All, isBossWave);
     }
 
     public void OnZombieDied(bool wasBoss)
@@ -103,6 +124,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         zombiesAlive--;
         OnZombiesAliveChanged?.Invoke(zombiesAlive);
+
+        // Actualiza propiedad
+        PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "zombiesAlive", zombiesAlive } });
 
         photonView.RPC(nameof(RPC_UpdateZombiesAlive), RpcTarget.Others, zombiesAlive);
         LeaderboardService.AddScore(1, "kill_highscore");
@@ -130,7 +154,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         OnAlivePlayersChanged?.Invoke(alivePlayers);
 
         if (PhotonNetwork.IsMasterClient && alivePlayers <= 0)
-            PhotonNetwork.LoadLevel((nameof(ScenesEnum.GameOver))); // logica derrota
+            PhotonNetwork.LoadLevel((nameof(ScenesEnum.GameOver)));
     }
 
     private void Victory()
@@ -142,7 +166,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RPC_Victory()
     {
-        if (PhotonNetwork.IsMasterClient) SceneLoader.LoadSceneByPhoton(ScenesEnum.Victory);
+        if (PhotonNetwork.IsMasterClient)
+            SceneLoader.LoadSceneByPhoton(ScenesEnum.Victory);
     }
 
     [PunRPC]
@@ -160,7 +185,31 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RPC_ActivateBossWarning(bool isBossWave)
     {
-        // sincroniza el mensaje de warning del boss
         lvlUI.SetBossWarningActive(isBossWave);
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if (newMasterClient == null) return;
+
+        if (PhotonNetwork.LocalPlayer == newMasterClient)
+        {
+            // Recupera el estado de la partida desde Custom Properties
+            if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("currentWave"))
+            {
+                currentWave = (int)PhotonNetwork.CurrentRoom.CustomProperties["currentWave"];
+                zombiesAlive = (int)PhotonNetwork.CurrentRoom.CustomProperties["zombiesAlive"];
+                isBossWave = (bool)PhotonNetwork.CurrentRoom.CustomProperties["isBossWave"];
+            }
+
+            OnWaveStarted?.Invoke(currentWave, zombiesAlive, isBossWave);
+            OnZombiesAliveChanged?.Invoke(zombiesAlive);
+            lvlUI.SetBossWarningActive(isBossWave);
+
+            // Transferir ownership de zombies
+            ZombieSpawner spawner = FindObjectOfType<ZombieSpawner>();
+            if (spawner != null)
+                spawner.TransferAllZombiesOwnership(newMasterClient);
+        }
     }
 }
