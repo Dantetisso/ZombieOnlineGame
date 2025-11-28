@@ -74,6 +74,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         mainCamera = Camera.main;
         grenadeCount = maxGrenadeCount;
         OnChangeGrenade?.Invoke(grenadeCount);
+        healthScript.OnDeath += Die;
 
         if (photonView.IsMine || !PhotonNetwork.IsConnected)
         {
@@ -366,13 +367,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         attackFeedback.SetActive(false);
     }
     #endregion
+    
     public void TakeDamage(int damage)
     {
         healthScript.GetDamage(damage);
-        if (healthScript._currentHealth <= 0)
-        {
-            Die();
-        }
     }
 
     public void Die()
@@ -384,6 +382,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     private void RPC_PlayerDied(int ID)
     {
         OnPlayerDied?.Invoke(ID);
+    }
+
+    public override void OnDisable()
+    {
+        healthScript.OnDeath -= Die;
     }
 
     #region Gizmos

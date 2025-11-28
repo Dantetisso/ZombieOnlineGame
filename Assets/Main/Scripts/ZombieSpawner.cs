@@ -38,6 +38,10 @@ public class ZombieSpawner : MonoBehaviourPun
                 if (PhotonNetwork.IsMasterClient)   // doble chequeo para que al salir un player no se destruyan los prefab instanciados
                 {
                     GameObject go = PhotonNetwork.Instantiate(zombiePrefab.name, spawnPoint.position, Quaternion.identity);
+
+                    ZombieController zombie = go.GetComponent<ZombieController>();
+                    zombie.SetSpawnerReference(this);   // setea la referencia del zombi
+
                     if (go.TryGetComponent(out ZombieController zombieCtrl))
                     {
                         // Asigna los waypoints que son hijos del contenedor de waypoints

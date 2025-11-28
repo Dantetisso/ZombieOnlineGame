@@ -14,6 +14,7 @@ public class HealthScript : MonoBehaviourPun
     [SerializeField] private GameObject damageFeedbackObject;
 
     public event Action<int, int> OnHealthChanged;
+    public event Action OnDeath;
 
     private Renderer _renderer;
     private Color _originalColor;
@@ -46,6 +47,7 @@ public class HealthScript : MonoBehaviourPun
         if (currentHealth <= 0 && !isDead)
         {
             isDead = true;
+            OnDeath?.Invoke();
         }
     }
 

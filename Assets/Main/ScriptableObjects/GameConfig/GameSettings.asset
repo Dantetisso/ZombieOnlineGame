@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: 
   <_maxWaves>k__BackingField: 3
-  <_baseZombies>k__BackingField: 1
+  <_baseZombies>k__BackingField: 2
   <_zombiesPerRound>k__BackingField: 0
   <_bossRound>k__BackingField: 3
