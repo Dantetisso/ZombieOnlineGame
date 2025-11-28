@@ -255,8 +255,8 @@ public class ZombieController : MonoBehaviourPunCallbacks, IDamageable
         PhotonNetwork.Destroy(gameObject);
     }
 
-    public void SetSpawnerReference(ZombieSpawner sp)
-    {
+    public void SetSpawnerReference(ZombieSpawner sp)   // guarda la referencia del zombiespawner
+    {   // asi le avisa cuando muere, asi actualiza al gamemanager
         spawner = sp;
     }
 
