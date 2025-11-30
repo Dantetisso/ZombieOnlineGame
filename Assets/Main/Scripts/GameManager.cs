@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     private int currentWave;
     private int zombiesAlive;
     private int deadPlayers = 0;
+    private int alivePlayers;
     private bool isBossWave = false;
 
     public int CurrentWave => currentWave;
@@ -41,7 +43,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.InRoom)
         {
-            int alivePlayers = PhotonNetwork.CurrentRoom.PlayerCount - deadPlayers;
+            alivePlayers = PhotonNetwork.CurrentRoom.PlayerCount - deadPlayers;
             OnAlivePlayersChanged?.Invoke(alivePlayers);
         }
 
@@ -50,6 +52,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             if (!PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("currentWave")) // chequeo en las propiedades de la room si ya hay un estado de ronda guardado
             {
+                // cuando se crea la sala se guarda los jugadores muertos por pimera vez
+                Hashtable props = new Hashtable { { "alivePlayers", PhotonNetwork.CurrentRoom.PlayerCount }};   // el 0 porque no murio nadie todavia
+                PhotonNetwork.CurrentRoom.SetCustomProperties(props);
                 StartNextWave();
             }   // si no lo hay lo guardo
             else
@@ -58,6 +63,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 currentWave = (int)PhotonNetwork.CurrentRoom.CustomProperties["currentWave"];    // la ronda actual
                 zombiesAlive = (int)PhotonNetwork.CurrentRoom.CustomProperties["zombiesAlive"]; // la cantidad de zombis en la ronda
                 isBossWave = (bool)PhotonNetwork.CurrentRoom.CustomProperties["isBossWave"];   // si es la ronda del boss
+                alivePlayers = (int)PhotonNetwork.CurrentRoom.CustomProperties["alivePlayers"];   // jugadores muertos en la partida
 
                 OnWaveStarted?.Invoke(currentWave, zombiesAlive, isBossWave);
                 OnZombiesAliveChanged?.Invoke(zombiesAlive);
@@ -101,14 +107,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         int amount = isBossWave ? 1 : baseZombies + (currentWave - 1) * zombiesPerRound;    // si es la ronda del boss solo hay 1 
         zombiesAlive = amount;                                                              // sino es la cantidad de zombies base + los que se agregan x ronda
                                                     // y los zombies vivos es el resultado 
-        
-        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable // Actualiza las propiedades de la room, 
-        {                                                                              //  asi cuando se cambia el ownership del master se puede continuar el juego
-            { "currentWave", currentWave },
-            { "zombiesAlive", zombiesAlive },
-            { "isBossWave", isBossWave }
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(props);
+        Hashtable props = new Hashtable {{ "currentWave", currentWave }, { "zombiesAlive", zombiesAlive }, { "isBossWave", isBossWave }};// Actualiza las propiedades de la room,   
+        PhotonNetwork.CurrentRoom.SetCustomProperties(props); //  asi cuando se cambia el ownership del master se puede continuar el juego  
 
         OnWaveStarted?.Invoke(currentWave, amount, isBossWave);
         OnZombiesAliveChanged?.Invoke(zombiesAlive);
@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         OnZombiesAliveChanged?.Invoke(zombiesAlive);
 
         // Actualiza la propiedad de la room de los zombis vivos
-        PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "zombiesAlive", zombiesAlive } });
+        PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { { "zombiesAlive", zombiesAlive } });
 
         photonView.RPC(nameof(RPC_UpdateZombiesAlive), RpcTarget.Others, zombiesAlive);
         LeaderboardService.AddScore(1, "kill_highscore");   // y suma el score a la leaderboard
@@ -150,8 +150,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         deadPlayersIDs.Add(viewID); // sino lo agrega al y suma el contador
         deadPlayers++;
 
-        int alivePlayers = PhotonNetwork.CurrentRoom.PlayerCount - deadPlayers; // calcula la cantidad de jugadores vivos en la room
+        alivePlayers = PhotonNetwork.CurrentRoom.PlayerCount - deadPlayers; // calcula la cantidad de jugadores vivos en la room
         OnAlivePlayersChanged?.Invoke(alivePlayers);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { { "alivePlayers", alivePlayers } });
 
         if (PhotonNetwork.IsMasterClient && alivePlayers <= 0)  // si es el master y ya no quedan jugadores vivos derrota
             PhotonNetwork.LoadLevel((nameof(ScenesEnum.GameOver)));
@@ -200,16 +201,29 @@ public class GameManager : MonoBehaviourPunCallbacks
                 currentWave = (int)PhotonNetwork.CurrentRoom.CustomProperties["currentWave"];
                 zombiesAlive = (int)PhotonNetwork.CurrentRoom.CustomProperties["zombiesAlive"];
                 isBossWave = (bool)PhotonNetwork.CurrentRoom.CustomProperties["isBossWave"];
+                alivePlayers = (int)PhotonNetwork.CurrentRoom.CustomProperties["alivePlayers"];
             }
 
             OnWaveStarted?.Invoke(currentWave, zombiesAlive, isBossWave);   
             OnZombiesAliveChanged?.Invoke(zombiesAlive);
             lvlUI.SetBossWarningActive(isBossWave);
+            OnAlivePlayersChanged?.Invoke(alivePlayers);
 
             // Transferir ownership de zombies
             ZombieSpawner spawner = FindObjectOfType<ZombieSpawner>();
             if (spawner != null)
                 spawner.TransferAllZombiesOwnership(newMasterClient);
+        }
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        if (!deadPlayersIDs.Contains(otherPlayer.ActorNumber))  // si el jugador que se fue ya estaba muerto no se le resta al contador de jugadores vivos
+        {
+            alivePlayers--;
+            OnAlivePlayersChanged?.Invoke(alivePlayers);
+
+            PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable{{"alivePlayers", alivePlayers}});
         }
     }
 }

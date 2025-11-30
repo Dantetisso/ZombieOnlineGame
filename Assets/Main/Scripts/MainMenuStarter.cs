@@ -63,6 +63,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         }
 
         ConnectionManager.Instance.SetNickName(playerName);
+        PlayerNameHelper.SetPlayerName(playerName); // setea el nombre del score con el nombre del player
 
         if (!PhotonNetwork.IsConnected)
         {
