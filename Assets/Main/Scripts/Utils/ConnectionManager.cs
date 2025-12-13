@@ -77,12 +77,14 @@ public class ConnectionManager : MonoBehaviourPunCallbacks // conecta entre el j
     public void HandleNewPlayerInRoom(Player player)
     {
         OnPlayerEnterRoom?.Invoke();
+        if (!PhotonNetwork.IsMasterClient) return;
         LobbyMesenger.PlayerEnterMessage(player.NickName);
     }
                                                             // manejan la entrada y salida de jugadores
     public void HandlePlayerLeftRoom(Player player)
     {
         OnPlayerLeaveRoom?.Invoke();
+        if (!PhotonNetwork.IsMasterClient) return;
         LobbyMesenger.PlayerLeftMessage(player.NickName);
     }
 

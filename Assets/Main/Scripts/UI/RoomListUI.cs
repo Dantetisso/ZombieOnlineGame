@@ -43,7 +43,7 @@ public class RoomListUI : MonoBehaviour
         for (int i = 0; i < slots.Length; i++)
         {
             slots[i].roomNameText.text = "Empty";
-            slots[i].playerCountText.text = "Players: 0/4";
+            slots[i].playerCountText.text = "Players: 0 / 4";
             slots[i].joinButton.gameObject.SetActive(false);
             slots[i].joinButton.onClick.RemoveAllListeners();
         }
