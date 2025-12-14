@@ -76,6 +76,10 @@ MonoBehaviour:
   - RPC_PlayAttackFeedback
   - RPC_GrenadeAttack
   - RPC_GrenadeSound
+  - RPC_Revive
+  - RPC_RequestRevive
+  - RPC_SetLifeState
+  - RPC_TryRevive
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -4,6 +4,13 @@ using Photon.Pun;
 using TMPro;
 using System;
 
+public enum PlayerStates
+{
+    Alive,
+    Downed,
+    Dead
+}
+
 public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 {
     #region  Variables
@@ -26,6 +33,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
     [Header("Interaction")]
     [SerializeField] private LayerMask interactableLayer;
+    [SerializeField] private LayerMask playerLayer;
     [SerializeField] private Transform interactPoint;
     [SerializeField] private CameraWork cameraFollow;
     [SerializeField] private Gun[] guns;
@@ -54,6 +62,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     private HealthScript healthScript;
     private Camera mainCamera;
     Animator anim;
+
+    [Header("Life State")]
+    [SerializeField] private float downedTime = 5f;
+
+    private PlayerStates lifeState = PlayerStates.Alive;
+    private bool hasBeenDowned = false;
+    private Coroutine downedCoroutine;
 
     [Header("UI")]
     [SerializeField] private GameObject localHUD;
@@ -96,6 +111,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     {
         if (photonView.IsMine)
         {
+            if (lifeState != PlayerStates.Alive) return;
+
             horizontal = Input.GetAxisRaw("Horizontal");
             vertical = Input.GetAxisRaw("Vertical");
 
@@ -122,6 +139,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         if (photonView.IsMine)
         {
             if (isEvading) return;
+            if (lifeState != PlayerStates.Alive) return;
+            
             Move();
         }
     }
@@ -189,7 +208,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
     void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.E)) ONInteract();
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+          ONInteract(); // interactuar con objetos
+          TryRevivePlayer();    // con jugador 
+        } 
 
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1)) && currentEvades > 0 && !isEvading)
             Evade();
@@ -293,6 +316,30 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         }
     }
 
+    private void TryRevivePlayer()
+{
+    if (!photonView.IsMine) return;
+
+    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 1.2f, playerLayer);
+
+    foreach (var col in colliders)
+    {
+        if (!col.TryGetComponent(out PlayerMovement other)) continue;
+        if (other == this) continue;
+
+        // IMPORTANTE:
+        // NO chequeamos IsDowned() acá
+        // El estado local puede estar desincronizado
+        Debug.Log("Intentando revivir a: " + other.photonView.Owner.NickName);
+
+        // Mandamos el pedido a TODOS
+        // Solo el que esté Downed va a reaccionar
+        other.photonView.RPC(nameof(RPC_Revive), RpcTarget.AllBuffered);
+
+        break; // revive a uno solo
+    }
+}
+
     private void MeleeAttack()
     {
         if (Time.time < nextAttackTime) return;
@@ -335,7 +382,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     }
     #endregion
 
-    #region RPCs
+#region RPCs
     [PunRPC]
     void RPC_ChangeGun(GunEnum type)
     {
@@ -365,13 +412,35 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         StartCoroutine(DisableFeedbackAfter(duration));
     }
 
+    [PunRPC]
+    private void RPC_PlayerDied(int ID)
+    {
+        OnPlayerDied?.Invoke(ID);
+    }
+
+    [PunRPC]
+    private void RPC_Revive()
+    {
+        if (lifeState != PlayerStates.Downed) return;
+
+        Debug.Log("RPC_Revive ejecutado correctamente");
+
+        Revive();
+    }
+
+    [PunRPC]
+    private void RPC_SetLifeState(PlayerStates state)
+    {
+        lifeState = state;
+    }
+#endregion
+
     IEnumerator DisableFeedbackAfter(float time)
     {
         yield return new WaitForSeconds(time);
         attackFeedback.SetActive(false);
     }
-    #endregion
-    
+
     public void TakeDamage(int damage)
     {
         healthScript.GetDamage(damage);
@@ -379,26 +448,78 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
     public void Die()
     {
-      photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered, photonView.ViewID);
+        if (lifeState == PlayerStates.Alive && !hasBeenDowned)
+        {
+            EnterDownedState();
+            return;
+        }
+
+        lifeState = PlayerStates.Dead;
+        photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered, photonView.ViewID);
     }
 
-    [PunRPC]
-    private void RPC_PlayerDied(int ID)
+    private void EnterDownedState()
     {
-        OnPlayerDied?.Invoke(ID);
+        hasBeenDowned = true;
+        lifeState = PlayerStates.Downed;
+
+        photonView.RPC(nameof(RPC_SetLifeState), RpcTarget.AllBuffered, PlayerStates.Downed);
+        if (photonView.IsMine)
+        {
+            rb.velocity = Vector2.zero;
+        }
+        anim.SetBool("IsDowned", true);
+        downedCoroutine = StartCoroutine(DownedTimer());
     }
 
-    public override void OnDisable()
+    private IEnumerator DownedTimer()
     {
-        healthScript.OnDeath -= Die;
+        float timer = downedTime;
+
+        while (timer > 0)
+        {
+            timer -= Time.deltaTime;
+            yield return null;
+        }
+
+        // si nadie lo revivió
+        Die();
     }
 
-    #region Gizmos
+    public void Revive()
+    {
+        if (lifeState != PlayerStates.Downed) return;
+
+        lifeState = PlayerStates.Alive;
+        hasBeenDowned = false;
+
+        photonView.RPC(nameof(RPC_SetLifeState), RpcTarget.AllBuffered, PlayerStates.Alive);
+
+        if (downedCoroutine != null) StopCoroutine(downedCoroutine);
+
+        anim.SetBool("IsDowned", false);
+        healthScript.ResetHealth();
+
+    }
+
+#region Gizmos
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(attackPoint.position, new Vector3(attackRange, attackRange, 0));
     }
-    
-    #endregion
+#endregion
+
+#region  Metodos Test
+    [ContextMenu("FORCE REVIVE")]
+    public void ForceRevive()
+    {
+        Revive();
+    }
+#endregion
+
+    public override void OnDisable()
+    {
+        healthScript.OnDeath -= Die;
+    }
 }
