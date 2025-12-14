@@ -3750,6 +3750,7 @@ MonoBehaviour:
   maxGrenadeCount: 5
   grenadeThrowForce: 10
   downedTime: 10
+  maxDowns: 1
   localHUD: {fileID: 8260476522810903657}
   netWorkHUD: {fileID: 2106305805718525421}
   playerNameText: {fileID: 7493352220643332536}

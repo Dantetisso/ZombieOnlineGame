@@ -63,9 +63,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     private Camera mainCamera;
     Animator anim;
 
-    [Header("Life State")]
-    [SerializeField] private float downedTime = 5f;
-
+    [Header("Revive Settings")]
+    [SerializeField] private float downedTime;
+    [SerializeField] private int maxDowns;   // Cuántas veces puede ser derribado
+    private int currentDowns; 
     private PlayerStates lifeState = PlayerStates.Alive;
     private bool hasBeenDowned = false;
     private Coroutine downedCoroutine;
@@ -86,7 +87,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         rb = GetComponent<Rigidbody2D>();
         healthScript = GetComponent<HealthScript>();
         anim = GetComponent<Animator>();
-
+        
+        currentDowns = 0;
         currentEvades = maxEvades;
         mainCamera = Camera.main;
         grenadeCount = maxGrenadeCount;
@@ -317,28 +319,25 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     }
 
     private void TryRevivePlayer()
-{
-    if (!photonView.IsMine) return;
-
-    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 1.2f, playerLayer);
-
-    foreach (var col in colliders)
     {
-        if (!col.TryGetComponent(out PlayerMovement other)) continue;
-        if (other == this) continue;
+        if (!photonView.IsMine) return;
 
-        // IMPORTANTE:
-        // NO chequeamos IsDowned() acá
-        // El estado local puede estar desincronizado
-        Debug.Log("Intentando revivir a: " + other.photonView.Owner.NickName);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 1.2f, playerLayer);
 
-        // Mandamos el pedido a TODOS
-        // Solo el que esté Downed va a reaccionar
-        other.photonView.RPC(nameof(RPC_Revive), RpcTarget.AllBuffered);
+        foreach (var col in colliders)
+        {
+            if (!col.TryGetComponent(out PlayerMovement other)) continue;
+            if (other == this) continue;
 
-        break; // revive a uno solo
+            Debug.Log("Intentando revivir a: " + other.photonView.Owner.NickName);
+
+            // Mandamos el pedido a TODOS
+            // Solo el que esté Downed va a reaccionar
+            other.photonView.RPC(nameof(RPC_Revive), RpcTarget.AllBuffered);
+
+            break; // revive a uno solo
+        }
     }
-}
 
     private void MeleeAttack()
     {
@@ -448,12 +447,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
     public void Die()
     {
-        if (lifeState == PlayerStates.Alive && !hasBeenDowned)
+        // Si todavía puede ser derribado
+        if (lifeState == PlayerStates.Alive && currentDowns < maxDowns)
         {
+            currentDowns++;   // suma un derribo
             EnterDownedState();
             return;
         }
 
+        // Si ya no le quedan derribos → MUERE
         lifeState = PlayerStates.Dead;
         photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered, photonView.ViewID);
     }
@@ -464,10 +466,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         lifeState = PlayerStates.Downed;
 
         photonView.RPC(nameof(RPC_SetLifeState), RpcTarget.AllBuffered, PlayerStates.Downed);
+
         if (photonView.IsMine)
         {
             rb.velocity = Vector2.zero;
         }
+
         anim.SetBool("IsDowned", true);
         downedCoroutine = StartCoroutine(DownedTimer());
     }
@@ -493,13 +497,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         lifeState = PlayerStates.Alive;
         hasBeenDowned = false;
 
-        photonView.RPC(nameof(RPC_SetLifeState), RpcTarget.AllBuffered, PlayerStates.Alive);
-
-        if (downedCoroutine != null) StopCoroutine(downedCoroutine);
+        if (downedCoroutine != null)
+            StopCoroutine(downedCoroutine);
 
         anim.SetBool("IsDowned", false);
         healthScript.ResetHealth();
 
+        Debug.Log($"Revive ejecutado. Derribos: {currentDowns}/{maxDowns}");
     }
 
 #region Gizmos
