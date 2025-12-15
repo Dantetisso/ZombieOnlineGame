@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using System.Collections;
+using Photon.Pun;
 
 public class RoomListUI : MonoBehaviour
 {
@@ -24,18 +25,22 @@ public class RoomListUI : MonoBehaviour
 
     private void OnEnable()
     {
-        if (ConnectionManager.Instance != null) ConnectionManager.Instance.photonManager.OnNewRoomCreated += SafeUpdateRoomList;
+        if (ConnectionManager.Instance != null)
+            ConnectionManager.Instance.OnRoomListChanged += RefreshUI;
+    
+        RefreshUI();
     }
 
     private void OnDisable()
     {
-        if (ConnectionManager.Instance != null) ConnectionManager.Instance.photonManager.OnNewRoomCreated -= SafeUpdateRoomList;
+        if (ConnectionManager.Instance != null)
+            ConnectionManager.Instance.OnRoomListChanged -= RefreshUI;
     }
 
     private void SafeUpdateRoomList(List<RoomInfo> rooms) // asegurar de limpiar suscripciones 
     {
         if (this == null || gameObject == null) return;
-        UpdateRoomList(rooms);
+        RefreshUI();
     }
 
     public void UpdateRoomList(List<RoomInfo> rooms)
@@ -74,25 +79,45 @@ public class RoomListUI : MonoBehaviour
             }
         }
     }
-    
-    // 🔍 BUSQUEDA POR HOST
-public List<RoomInfo> GetRoomsByHostNickname(List<RoomInfo> rooms, string nickname)
-{
-List<RoomInfo> result = new List<RoomInfo>();
 
+    public List<RoomInfo> GetRoomsByHostNickname(List<RoomInfo> rooms, string nickname)
+    {
+        List<RoomInfo> result = new List<RoomInfo>();
+        
+        foreach (RoomInfo room in rooms)
+        {
+            if (room.CustomProperties.TryGetValue("HostNick", out object host))
+            {
+                if (host.ToString().ToLower().Contains(nickname.ToLower()))
+                {
+                    result.Add(room);
+                }
+            }
+        }
 
-foreach (RoomInfo room in rooms)
-{
-if (room.CustomProperties.TryGetValue("HostNick", out object host))
-{
-if (host.ToString().ToLower().Contains(nickname.ToLower()))
-{
-result.Add(room);
-}
-}
-}
-return result;
-}
+        return result;
+    }
+
+    public void RefreshUI()
+    {
+        if (ConnectionManager.Instance == null) return;
+
+        // 🔥 SI ESTOY EN UNA ROOM, NO ACTUALIZO LISTA
+        if (PhotonNetwork.InRoom)
+            return;
+
+        List<RoomInfo> allRooms = ConnectionManager.Instance.GetAllRoomsCached();
+
+        // 🔥 FILTRAR ROOMS VALIDAS
+        List<RoomInfo> validRooms = new List<RoomInfo>();
+        foreach (RoomInfo room in allRooms)
+        {
+            if (!room.RemovedFromList)
+                validRooms.Add(room);
+        }
+
+        UpdateRoomList(validRooms);
+    }
 
     IEnumerator WarningText()
     {
@@ -101,11 +126,4 @@ return result;
         warningtext.SetActive(false);
     }
 
-
-[ContextMenu("Can Play Alone")] // para usar para jugar solo
-    public void CanPlayAlone()
-    {
-        canplayAlone = true;
-    }
-    
 }

@@ -14,8 +14,10 @@ public class ConnectionManager : MonoBehaviourPunCallbacks // conecta entre el j
     public Action OnJoinRoom;
     public Action OnPlayerEnterRoom;
     public Action OnPlayerLeaveRoom;
+    public event Action OnRoomListChanged;
 
     private List<RoomInfo> rooms = new List<RoomInfo>();
+    private Dictionary<string, RoomInfo> cachedRooms = new Dictionary<string, RoomInfo>();
 
     void Awake()
     {
@@ -98,9 +100,22 @@ public class ConnectionManager : MonoBehaviourPunCallbacks // conecta entre el j
         this.rooms = rooms;
     }
 
+    public void UpdateCachedRooms(List<RoomInfo> roomList)
+    {
+        foreach (RoomInfo room in roomList)
+        {
+            if (room.RemovedFromList)
+                cachedRooms.Remove(room.Name);
+            else
+                cachedRooms[room.Name] = room;
+        }
+
+        OnRoomListChanged?.Invoke(); 
+    }
+
     public List<RoomInfo> GetAllRoomsCached()
     {
-        return new List<RoomInfo>(rooms);
+        return new List<RoomInfo>(cachedRooms.Values);
     }
 
     public string GetCurrentRoomName()

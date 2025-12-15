@@ -71,9 +71,9 @@ public class PhotonConnectionManager : MonoBehaviourPunCallbacks
     public Room GetCurrentRoom() { return PhotonNetwork.CurrentRoom; }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
-    {
-        OnNewRoomCreated?.Invoke(roomList);
-    }
+{
+    ConnectionManager.Instance.UpdateCachedRooms(roomList);
+}
 
     public void LeaveRoom() { PhotonNetwork.LeaveRoom(); }
 
@@ -91,6 +91,7 @@ public class PhotonConnectionManager : MonoBehaviourPunCallbacks
     {
         OnPlayerLeftRoomEvent?.Invoke(otherPlayer);
     }
+    
 
 }
 

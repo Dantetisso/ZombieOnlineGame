@@ -143,17 +143,17 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
     {
         if (searchErrorText != null)
             searchErrorText.SetActive(false);
-    
+
         if (searchResultPanel != null)
             searchResultPanel.SetActive(false);
-    
+
         string searchText = searchPlayerInput.text.Trim();
         if (string.IsNullOrEmpty(searchText))
             return;
-    
+
         List<RoomInfo> allRooms = ConnectionManager.Instance.GetAllRoomsCached();
         List<RoomInfo> foundRooms = new List<RoomInfo>();
-    
+
         foreach (RoomInfo room in allRooms)
         {
             if (room.CustomProperties != null &&
@@ -165,17 +165,17 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
                 }
             }
         }
-    
+
         if (foundRooms.Count == 0)
         {
             if (searchErrorText != null)
                 searchErrorText.SetActive(true);
             return;
         }
-    
+
         joinPanel.SetActive(false);
         searchResultPanel.SetActive(true);
-    
+
         searchRoomListUI.UpdateRoomList(foundRooms);
     }
 
@@ -183,6 +183,8 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
     {
         searchResultPanel.SetActive(false);
         joinPanel.SetActive(true);
+        
+        roomListUI.RefreshUI();
 
         if (searchErrorText != null)
             searchErrorText.SetActive(false);
