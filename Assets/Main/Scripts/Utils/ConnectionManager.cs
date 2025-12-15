@@ -98,9 +98,9 @@ public class ConnectionManager : MonoBehaviourPunCallbacks // conecta entre el j
         this.rooms = rooms;
     }
 
-    public List<RoomInfo> GetAllRooms()
+    public List<RoomInfo> GetAllRoomsCached()
     {
-        return rooms;
+        return new List<RoomInfo>(rooms);
     }
 
     public string GetCurrentRoomName()

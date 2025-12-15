@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Photon.Pun;
+using Photon.Realtime;
+using System.Collections.Generic;
+
 public class MainMenuStarter : MonoBehaviourPunCallbacks
 {
     public static bool hasRequestedJoinRoom = false;
@@ -29,6 +32,15 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
     [SerializeField] private RoomListUI.RoomSlot[] roomSlots; // slots fijos asignados en inspector
     private RoomListUI roomListUI;
 
+    [Header("Search Room UI")]
+    [SerializeField] private TMP_InputField searchPlayerInput;
+    [SerializeField] private Button searchRoomButton;
+
+    [SerializeField] private GameObject searchResultPanel;
+    [SerializeField] private RoomListUI searchRoomListUI;
+    [SerializeField] private GameObject searchErrorText;
+    [SerializeField] private Button searchBackButton;
+
     void Start()
     {
         PhotonNetwork.IsMessageQueueRunning = true;
@@ -41,38 +53,54 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         createRoomConfirmButton.onClick.AddListener(OnCreateRoomConfirmed);
         createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
 
+        searchRoomButton.onClick.AddListener(OnSearchRoomClicked);
+        searchBackButton.onClick.AddListener(OnSearchBackClicked);
+
+        if (searchResultPanel != null)
+        {
+            searchResultPanel.SetActive(false);
+        }
+
+        if (searchErrorText != null)
+        {
+            searchErrorText.SetActive(false);
+        }
+
         joinPanel.SetActive(false);
         createRoomPanel.SetActive(false);
 
-        // Tomo el RoomListUI desde el panel
         roomListUI = joinPanel.GetComponent<RoomListUI>();
 
-        // Asignar slots desde inspector
         if (roomListUI != null && roomSlots.Length > 0)
+        {
             roomListUI.slots = roomSlots;
+        }
+
+        if (searchRoomListUI != null && roomSlots.Length > 0)
+        {
+            searchRoomListUI.slots = roomSlots;
+        }
     }
 
     void OnConnectButtonClicked()
     {
         string playerName = playerNameInput.text.Trim();
 
-        if (string.IsNullOrEmpty(playerName))   // si no pusiste tu nombre te sale el texto de advertencia
+        if (string.IsNullOrEmpty(playerName))
         {
             StartCoroutine(warningText());
             return;
         }
 
         ConnectionManager.Instance.SetNickName(playerName);
-        PlayerNameHelper.SetPlayerName(playerName); // setea el nombre del score con el nombre del player
+        PlayerNameHelper.SetPlayerName(playerName);
 
         if (!PhotonNetwork.IsConnected)
         {
-            // Guardo referencia local de este objeto
             var self = this;
 
-            ConnectionManager.Instance.ConnectToServer(() =>        // se conecta al server
+            ConnectionManager.Instance.ConnectToServer(() =>
             {
-                // y chequeo si el objeto sigue existiendo
                 if (self == null || self.gameObject == null) return;
 
                 Debug.Log("Connected to server, showing rooms");
@@ -103,7 +131,7 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
         if (string.IsNullOrEmpty(roomName))
         {
-            roomName = PhotonNetwork.NickName + "'s Room"; // si no le pones un nombre a la room, pone este por defecto
+            roomName = PhotonNetwork.NickName + "'s Room";
         }
 
         ConnectionManager.Instance.CreateRoom(roomName);
@@ -111,12 +139,61 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
         createRoomPanel.SetActive(false);
     }
 
+    private void OnSearchRoomClicked()
+    {
+        if (searchErrorText != null)
+            searchErrorText.SetActive(false);
+    
+        if (searchResultPanel != null)
+            searchResultPanel.SetActive(false);
+    
+        string searchText = searchPlayerInput.text.Trim();
+        if (string.IsNullOrEmpty(searchText))
+            return;
+    
+        List<RoomInfo> allRooms = ConnectionManager.Instance.GetAllRoomsCached();
+        List<RoomInfo> foundRooms = new List<RoomInfo>();
+    
+        foreach (RoomInfo room in allRooms)
+        {
+            if (room.CustomProperties != null &&
+                room.CustomProperties.TryGetValue("HostNick", out object host))
+            {
+                if (host.ToString().ToLower().Contains(searchText.ToLower()))
+                {
+                    foundRooms.Add(room);
+                }
+            }
+        }
+    
+        if (foundRooms.Count == 0)
+        {
+            if (searchErrorText != null)
+                searchErrorText.SetActive(true);
+            return;
+        }
+    
+        joinPanel.SetActive(false);
+        searchResultPanel.SetActive(true);
+    
+        searchRoomListUI.UpdateRoomList(foundRooms);
+    }
+
+    private void OnSearchBackClicked()
+    {
+        searchResultPanel.SetActive(false);
+        joinPanel.SetActive(true);
+
+        if (searchErrorText != null)
+            searchErrorText.SetActive(false);
+    }
+
     public override void OnJoinedRoom()
     {
         if (hasRequestedJoinRoom)
         {
             hasRequestedJoinRoom = false;
-            SceneLoader.LoadScene(ScenesEnum.Lobby); 
+            SceneLoader.LoadScene(ScenesEnum.Lobby);
         }
     }
 
@@ -137,5 +214,11 @@ public class MainMenuStarter : MonoBehaviourPunCallbacks
 
         if (createRoomButton != null)
             createRoomButton.onClick.RemoveAllListeners();
+
+        if (searchRoomButton != null)
+            searchRoomButton.onClick.RemoveAllListeners();
+
+        if (searchBackButton != null)
+            searchBackButton.onClick.RemoveAllListeners();
     }
 }

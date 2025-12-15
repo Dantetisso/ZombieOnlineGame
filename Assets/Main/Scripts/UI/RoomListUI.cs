@@ -74,6 +74,25 @@ public class RoomListUI : MonoBehaviour
             }
         }
     }
+    
+    // 🔍 BUSQUEDA POR HOST
+public List<RoomInfo> GetRoomsByHostNickname(List<RoomInfo> rooms, string nickname)
+{
+List<RoomInfo> result = new List<RoomInfo>();
+
+
+foreach (RoomInfo room in rooms)
+{
+if (room.CustomProperties.TryGetValue("HostNick", out object host))
+{
+if (host.ToString().ToLower().Contains(nickname.ToLower()))
+{
+result.Add(room);
+}
+}
+}
+return result;
+}
 
     IEnumerator WarningText()
     {

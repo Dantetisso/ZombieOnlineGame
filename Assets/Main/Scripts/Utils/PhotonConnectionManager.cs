@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using ExitGames.Client.Photon;
 using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
@@ -46,12 +46,15 @@ public class PhotonConnectionManager : MonoBehaviourPunCallbacks
 
     public void CreateRoom(string roomName)
     {
-        RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 4;
-        roomOptions.IsVisible = true;
-        roomOptions.IsOpen = true;
+        RoomOptions options = new RoomOptions
+        {
+            MaxPlayers = 4,
+            IsVisible = true,
+            IsOpen = true,
+            CustomRoomProperties = new Hashtable {{ "HostNick", PhotonNetwork.NickName }}, CustomRoomPropertiesForLobby = new[] { "HostNick" }
+        };
 
-        PhotonNetwork.CreateRoom(roomName, roomOptions);
+        PhotonNetwork.CreateRoom(roomName, options);
     }
     
     public void JoinRoom(string roomName)
