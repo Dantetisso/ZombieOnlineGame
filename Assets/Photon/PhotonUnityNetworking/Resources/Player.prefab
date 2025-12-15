@@ -3945,9 +3945,6 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 0
     Name: walk
-  - Type: 9
-    SynchronizeType: 0
-    Name: Revived
   - Type: 4
     SynchronizeType: 1
     Name: IsEvading
