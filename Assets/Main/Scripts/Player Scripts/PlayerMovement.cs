@@ -198,21 +198,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         rb.velocity = dir.normalized * movSpeed;
     }
 
-    void Evade()
-    {
-        if (rb.velocity != Vector2.zero)
-        {
-            isEvading = true;
-            anim.SetBool("IsEvading", isEvading);
-            currentEvades--;
-            rb.velocity = Vector2.zero;
-            rb.AddForce(dir.normalized * evadeForce, ForceMode2D.Impulse);
-
-            StartCoroutine(EndEvade());
-            StartCoroutine(ReloadEvade());
-        }
-    }
-
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.E))
@@ -221,12 +206,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
           TryRevivePlayer();    // con jugador 
         } 
 
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1)) && currentEvades > 0 && !isEvading)
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse1)) && currentEvades > 0 && !isEvading) 
+        {
             Evade();
-
-        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
-
-        if (Input.GetKeyDown(KeyCode.P)) RoomLeaver.Instance.LeaveRoom();
+        }
 
         if (Input.GetKeyDown(KeyCode.V)) MeleeAttack();
 
@@ -273,21 +256,37 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     {
         if (grenadeCount > 0)
         {
-            // Crear la granada en la posición del jugador
+            // Crea la granada en la posición del jugador
             GameObject grenade = PhotonNetwork.Instantiate(grenadeObject.name, grenadePos.position, Quaternion.identity);
 
-            // Obtener el Rigidbody2D
             Rigidbody2D grenadeRb = grenade.GetComponent<Rigidbody2D>();
             if (grenadeRb == null) return;
 
-            // Calcular la dirección hacia el mouse
+            // Calcula la dirección hacia el mouse
             Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             Vector2 throwDir = (mouseWorldPos - grenadePos.position).normalized;
 
-            // Aplicar fuerza a la granada
+            // Aplica fuerza a la granada
             grenadeRb.AddForce(throwDir * grenadeThrowForce, ForceMode2D.Impulse);
             grenadeCount--;
+
             OnChangeGrenade?.Invoke(grenadeCount);
+        }
+    }
+
+    #region Evasión
+    void Evade()
+    {
+        if (rb.velocity != Vector2.zero)
+        {
+            isEvading = true;
+            anim.SetBool("IsEvading", isEvading);
+            currentEvades--;
+            rb.velocity = Vector2.zero;
+            rb.AddForce(dir.normalized * evadeForce, ForceMode2D.Impulse);
+
+            StartCoroutine(EndEvade());
+            StartCoroutine(ReloadEvade());
         }
     }
 
@@ -308,7 +307,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     {
         return (float)currentEvades / maxEvades;
     }
-
+    #endregion
+#region Metodos de ataque cuerpo a cuerpo e interacción
     private void ONInteract()
     {
         Collider2D[] colliders = Physics2D.OverlapBoxAll(interactPoint.position, new Vector2(1f, 1f), 0f, interactableLayer);
@@ -320,27 +320,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
                 interactable.Interact();
                 Debug.Log("Toque: <color=green>" + interactable + "</color>");
             }
-        }
-    }
-
-    private void TryRevivePlayer()
-    {
-        if (!photonView.IsMine) return;
-
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 1.2f, playerLayer);
-
-        foreach (var col in colliders)
-        {
-            if (!col.TryGetComponent(out PlayerMovement other)) continue;
-            if (other == this) continue;
-
-            Debug.Log("Intentando revivir a: " + other.photonView.Owner.NickName);
-
-            // Mandamos el pedido a TODOS
-            // Solo el que esté Downed va a reaccionar
-            other.photonView.RPC(nameof(RPC_Revive), RpcTarget.AllBuffered);
-
-            break; // revive a uno solo
         }
     }
 
@@ -384,12 +363,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
         nextAttackTime = Time.time + attackCooldown;
     }
+
     IEnumerator DisableFeedbackAfter(float time)
     {
         yield return new WaitForSeconds(time);
         attackFeedback.SetActive(false);
     }
+#endregion
 
+#region Manejo de daño y muerte
     public void TakeDamage(int damage)
     {
         healthScript.GetDamage(damage);
@@ -410,7 +392,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         // Si ya no le quedan derribos Muere
         lifeState = PlayerStates.Dead;
         photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered, photonView.ViewID);
-        
     }
 
     private void EnterDownedState()
@@ -463,6 +444,27 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
         photonView.RPC(nameof(RPC_HideDownedTimer), RpcTarget.All);
     }
+
+    private void TryRevivePlayer()
+    {
+        if (!photonView.IsMine) return;
+
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 1.2f, playerLayer);
+
+        foreach (var col in colliders)
+        {
+            if (!col.TryGetComponent(out PlayerMovement other)) continue;
+            if (other == this) continue;
+
+            Debug.Log("Intentando revivir a: " + other.photonView.Owner.NickName);
+
+            // Manda rpc para todos pero solo reacciona el q esta derribado
+            other.photonView.RPC(nameof(RPC_Revive), RpcTarget.AllBuffered);
+
+            break; // revive a uno solo
+        }
+    }
+#endregion
     #endregion
 
 #region RPCs
@@ -499,6 +501,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     private void RPC_PlayerDied(int ID)
     {
         OnPlayerDied?.Invoke(ID);
+
+        gameObject.SetActive(false);
     }
 
     [PunRPC]
