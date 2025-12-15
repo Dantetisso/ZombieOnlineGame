@@ -432,20 +432,20 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
     public void Revive()
     {
-        if (lifeState != PlayerStates.Downed) return;
+        if (lifeState != PlayerStates.Downed) return;   // si no esta derribado no hace nada
 
-        lifeState = PlayerStates.Alive;
+        lifeState = PlayerStates.Alive; // cambia el estado a vivo
         hasBeenDowned = false;
 
-        if (downedCoroutine != null) StopCoroutine(downedCoroutine);
+        if (downedCoroutine != null) StopCoroutine(downedCoroutine);    // detiene la corutina del derribo
 
         anim.SetBool("IsDowned", false);
-        healthScript.ResetHealth();
+        healthScript.ResetHealth();     // y restaura la salud del jugador revivido
 
-        photonView.RPC(nameof(RPC_HideDownedTimer), RpcTarget.All);
+        photonView.RPC(nameof(RPC_HideDownedTimer), RpcTarget.All);   // avisa para ocultar el text del timer de derribo
     }
 
-    private void TryRevivePlayer()
+    private void TryRevivePlayer()  // metodo para revivir jugadores
     {
         if (!photonView.IsMine) return;
 
@@ -453,10 +453,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
         foreach (var col in colliders)
         {
-            if (!col.TryGetComponent(out PlayerMovement other)) continue;
-            if (other == this) continue;
-
-            Debug.Log("Intentando revivir a: " + other.photonView.Owner.NickName);
+            if (!col.TryGetComponent(out PlayerMovement other)) continue;   // busca el componente PlayerMovement si el collider no lo tiene pasa al siguiente collider
+            if (other == this) continue;    // cuando lo tiene lo guarda en other y sigue
 
             // Manda rpc para todos pero solo reacciona el q esta derribado
             other.photonView.RPC(nameof(RPC_Revive), RpcTarget.AllBuffered);
@@ -501,7 +499,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     private void RPC_PlayerDied(int ID)
     {
         OnPlayerDied?.Invoke(ID);
-
         gameObject.SetActive(false);
     }
 
