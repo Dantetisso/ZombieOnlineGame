@@ -73,8 +73,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
     [Header("UI")]
     [SerializeField] private GameObject localHUD;
-    [SerializeField] private GameObject netWorkHUD;
+    [SerializeField] private GameObject networkHUD;
     [SerializeField] private TMP_Text playerNameText;
+    [SerializeField] private TMP_Text downedTimerText;   
+    [SerializeField] private Color normalTimerColor = Color.white;
+    [SerializeField] private Color dangerTimerColor = Color.red;
+
+    private float syncedDownedTimer;
 
     public event Action<Gun> OnChangeGun;
     public static event Action<int> OnPlayerDied;
@@ -152,7 +157,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         cameraFollow = mainCamera.GetComponent<CameraWork>();
 
         localHUD.SetActive(true);
-        netWorkHUD.SetActive(false);
+        networkHUD.SetActive(false);
 
         if (cameraFollow != null)
             cameraFollow.SetPlayer(transform);
@@ -172,7 +177,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
         if (camera != null) camera.gameObject.SetActive(false);
 
         localHUD.SetActive(false);
-        netWorkHUD.SetActive(true);
+        networkHUD.SetActive(true);
     }
 
     void Look()
@@ -379,6 +384,85 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
 
         nextAttackTime = Time.time + attackCooldown;
     }
+    IEnumerator DisableFeedbackAfter(float time)
+    {
+        yield return new WaitForSeconds(time);
+        attackFeedback.SetActive(false);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        healthScript.GetDamage(damage);
+    }
+
+    public void Die()
+    {
+        // Si todavía puede ser derribado
+        if (lifeState == PlayerStates.Alive && currentDowns < maxDowns)
+        {
+            currentDowns++;   // suma un derribo
+            EnterDownedState();
+            return;
+        }
+        
+        if (downedTimerText != null) downedTimerText.gameObject.SetActive(false);
+        
+        // Si ya no le quedan derribos Muere
+        lifeState = PlayerStates.Dead;
+        photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered, photonView.ViewID);
+        
+    }
+
+    private void EnterDownedState()
+    {
+        hasBeenDowned = true;
+        lifeState = PlayerStates.Downed;
+        
+        photonView.RPC(nameof(RPC_SetLifeState), RpcTarget.AllBuffered, PlayerStates.Downed);
+
+        if (photonView.IsMine)
+        {
+            rb.velocity = Vector2.zero;
+        }
+
+        anim.SetBool("IsDowned", true);
+        downedCoroutine = StartCoroutine(DownedTimer());
+        syncedDownedTimer = downedTime;
+
+        if (downedTimerText != null) downedTimerText.gameObject.SetActive(true);
+    }
+
+    private IEnumerator DownedTimer()
+    {
+        float timer = downedTime;
+
+        while (timer > 0)
+        {
+            timer -= Time.deltaTime;
+
+            photonView.RPC(nameof(RPC_UpdateDownedTimer), RpcTarget.All, timer);
+
+            yield return null;
+        }
+
+        // si nadie lo revivió
+        Die();
+    }
+
+    public void Revive()
+    {
+        if (lifeState != PlayerStates.Downed) return;
+
+        lifeState = PlayerStates.Alive;
+        hasBeenDowned = false;
+
+        if (downedCoroutine != null) StopCoroutine(downedCoroutine);
+
+        anim.SetBool("IsDowned", false);
+        healthScript.ResetHealth();
+
+        photonView.RPC(nameof(RPC_HideDownedTimer), RpcTarget.All);
+    }
     #endregion
 
 #region RPCs
@@ -432,79 +516,29 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IDamageable
     {
         lifeState = state;
     }
+
+    [PunRPC]
+    private void RPC_UpdateDownedTimer(float timeLeft)
+    {
+        syncedDownedTimer = timeLeft;
+
+        if (downedTimerText == null) return;
+
+        downedTimerText.gameObject.SetActive(true);
+        downedTimerText.text = Mathf.Ceil(timeLeft).ToString();
+
+        // Cambia a rojo en los últimos 5 segundos
+        downedTimerText.color = timeLeft <= 5f ? dangerTimerColor : normalTimerColor;
+    }
+
+    [PunRPC]
+    private void RPC_HideDownedTimer()
+    {
+        if (downedTimerText != null) downedTimerText.gameObject.SetActive(false);
+    }
 #endregion
 
-    IEnumerator DisableFeedbackAfter(float time)
-    {
-        yield return new WaitForSeconds(time);
-        attackFeedback.SetActive(false);
-    }
-
-    public void TakeDamage(int damage)
-    {
-        healthScript.GetDamage(damage);
-    }
-
-    public void Die()
-    {
-        // Si todavía puede ser derribado
-        if (lifeState == PlayerStates.Alive && currentDowns < maxDowns)
-        {
-            currentDowns++;   // suma un derribo
-            EnterDownedState();
-            return;
-        }
-
-        // Si ya no le quedan derribos → MUERE
-        lifeState = PlayerStates.Dead;
-        photonView.RPC(nameof(RPC_PlayerDied), RpcTarget.AllBuffered, photonView.ViewID);
-    }
-
-    private void EnterDownedState()
-    {
-        hasBeenDowned = true;
-        lifeState = PlayerStates.Downed;
-
-        photonView.RPC(nameof(RPC_SetLifeState), RpcTarget.AllBuffered, PlayerStates.Downed);
-
-        if (photonView.IsMine)
-        {
-            rb.velocity = Vector2.zero;
-        }
-
-        anim.SetBool("IsDowned", true);
-        downedCoroutine = StartCoroutine(DownedTimer());
-    }
-
-    private IEnumerator DownedTimer()
-    {
-        float timer = downedTime;
-
-        while (timer > 0)
-        {
-            timer -= Time.deltaTime;
-            yield return null;
-        }
-
-        // si nadie lo revivió
-        Die();
-    }
-
-    public void Revive()
-    {
-        if (lifeState != PlayerStates.Downed) return;
-
-        lifeState = PlayerStates.Alive;
-        hasBeenDowned = false;
-
-        if (downedCoroutine != null)
-            StopCoroutine(downedCoroutine);
-
-        anim.SetBool("IsDowned", false);
-        healthScript.ResetHealth();
-
-        Debug.Log($"Revive ejecutado. Derribos: {currentDowns}/{maxDowns}");
-    }
+    
 
 #region Gizmos
     void OnDrawGizmos()
