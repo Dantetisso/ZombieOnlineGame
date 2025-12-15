@@ -10,7 +10,6 @@ public class MessageDisplay : MonoBehaviour
     [SerializeField] private float messageLifetime = 5f; // Tiempo que dura cada mensaje
     [SerializeField] private int maxMessages = 5;
 
-    // Ahora guardamos también el color del mensaje
     private List<MessageEntry> messages = new List<MessageEntry>();
 
     private class MessageEntry
@@ -62,7 +61,7 @@ public class MessageDisplay : MonoBehaviour
 
     }
 
-    // Nuevo AddMessage: acepta string y Color
+    // agrega un mensaje con color
     public void AddMessageWithColor(string message, Color color)
     {
         if (messages.Count >= maxMessages)
@@ -72,7 +71,7 @@ public class MessageDisplay : MonoBehaviour
         UpdateUIText();
     }
 
-    // Mantener compatibilidad: color blanco por defecto
+    // agrega un mensaje sin color
     public void AddMessage(string message)
     {
         AddMessageWithColor(message, Color.white);
@@ -80,13 +79,14 @@ public class MessageDisplay : MonoBehaviour
 
     private void UpdateUIText()
     {
-        // Construimos con etiquetas <color>
         List<string> lines = new List<string>();
+
         foreach (var m in messages)
         {
             string hex = ColorUtility.ToHtmlStringRGB(m.color);
             lines.Add($"<color=#{hex}>{m.text}</color>");
         }
+        
         messageText.text = string.Join("\n", lines);
     }
 }

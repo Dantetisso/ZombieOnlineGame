@@ -20,7 +20,7 @@ public class RoomLeaver : MonoBehaviourPunCallbacks
 
     public void LeaveRoom()
     {
-        Debug.Log("<color=cyan> Sali de la room </color>");
+        LobbyMesenger.PlayerLeftMessage();
         Cursor.visible = true;
         PhotonNetwork.LeaveRoom();
     }
