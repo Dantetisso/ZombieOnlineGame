@@ -1555,6 +1555,7 @@ GameObject:
   - component: {fileID: 7581608038344600771}
   - component: {fileID: 5856225130239041573}
   - component: {fileID: 2863070079460948881}
+  - component: {fileID: 1096876224957229134}
   m_Layer: 6
   m_Name: ReviveIcon
   m_TagString: Untagged
@@ -1620,6 +1621,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1096876224957229134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4157636035878928925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 734f94fb9ffcb494cb9f76a689a84591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4189600815721422516
 GameObject:
   m_ObjectHideFlags: 0
@@ -1981,6 +1994,7 @@ GameObject:
   - component: {fileID: 2529665815777433563}
   - component: {fileID: 8760112513531455518}
   - component: {fileID: 8895510814214738254}
+  - component: {fileID: 9016303406862970743}
   m_Layer: 6
   m_Name: ReviveIcon
   m_TagString: Untagged
@@ -2046,6 +2060,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &9016303406862970743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4721080682894031310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 734f94fb9ffcb494cb9f76a689a84591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4912476461898246190
 GameObject:
   m_ObjectHideFlags: 0
@@ -2877,6 +2903,7 @@ GameObject:
   - component: {fileID: 8388599636475640428}
   - component: {fileID: 2676454647866711020}
   - component: {fileID: 8760283968619714591}
+  - component: {fileID: 3667231416336115467}
   m_Layer: 6
   m_Name: ReviveTimeText
   m_TagString: Untagged
@@ -3001,6 +3028,18 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &3667231416336115467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6998160835218136511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 734f94fb9ffcb494cb9f76a689a84591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7017117009761320811
 GameObject:
   m_ObjectHideFlags: 0
