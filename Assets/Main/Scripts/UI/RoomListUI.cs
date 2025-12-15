@@ -102,13 +102,13 @@ public class RoomListUI : MonoBehaviour
     {
         if (ConnectionManager.Instance == null) return;
 
-        // 🔥 SI ESTOY EN UNA ROOM, NO ACTUALIZO LISTA
+        // Si esta en una room, no actualiza la lista
         if (PhotonNetwork.InRoom)
             return;
 
         List<RoomInfo> allRooms = ConnectionManager.Instance.GetAllRoomsCached();
 
-        // 🔥 FILTRAR ROOMS VALIDAS
+        //  Filtra rooms validas
         List<RoomInfo> validRooms = new List<RoomInfo>();
         foreach (RoomInfo room in allRooms)
         {
